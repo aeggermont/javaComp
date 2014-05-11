@@ -11,4 +11,13 @@ public class SudokuGame extends SudokuBoard{
 		super(boardSize, row );
 	}
 	
+	public int getPositionValues(int xposition, int yposition) {
+		return sodoku[xposition][yposition];
+	}
+
+	public  void setPositionValues(int xposition, int yposition, int value) {
+		sodoku[xposition][yposition] = value;
+	}
+	
+	
 }

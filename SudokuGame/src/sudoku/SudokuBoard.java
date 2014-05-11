@@ -13,7 +13,7 @@ public class SudokuBoard {
 	 * @param args
 	 */
 	
-	protected static int [][] sodoku;
+	protected int [][] sodoku;
 	private static int boardSize;
 
 	/*
@@ -27,7 +27,7 @@ public class SudokuBoard {
 	/*
 	 * Prints the board
 	 */
-	public static void displayBoard(){
+	public void displayBoard(){
 		
 	    for (int x=0; x < boardSize; x++){
 	    	for (int y=0; y < boardSize ; y++){

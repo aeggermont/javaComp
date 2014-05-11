@@ -6,49 +6,32 @@ public class SodukuVerify {
 
     private static final int MAX_NUM_TRIES = 3;
 	
-	protected static boolean verifyinput(int boardSize, Scanner scannerline){
+	public static boolean verifyinput(int boardSize, Scanner scannerline){
 		int numtries = 0;
 	    String input;
 	    
 	    System.out.println("Enter row/column of numbers:");
 	    
-	    if (boardSize == 4){
-	    	 while(scannerline.hasNext()){
-	 	    	if (scannerline.hasNext("([0-9]+,){3,3}[0-9]+")){	
-	 		    	return true;
-	 	    	}else if(numtries > MAX_NUM_TRIES){
-	 	    		System.out.println("You have reached maximum number of attempts :( ");
-	 	    		return false;
-	 	    	} else{
-	 	    		numtries++;
-	 	    		input = scannerline.next();
-	 	    		System.out.println("Invalid input, enter row of numbers again");
-	 	    		continue;
-	 	    	}
-	 	    }
-	    }
 	    
-	    if (boardSize == 9){
-	    	 while(scannerline.hasNext()){
-		 	    	if (scannerline.hasNext("([0-9]+,){8,8}[0-9]+")){	
-		 		    	return true;
-		 	    	}else if(numtries > MAX_NUM_TRIES){
-		 	    		System.out.println("You have reached maximum number of attempts :( ");
-		 	    		return false;
-		 	    	} else{
-		 	    		numtries++;
-		 	    		input = scannerline.next();
-		 	    		System.out.println("Invalid input, enter row of numbers again");
-		 	    		continue;
-		 	    	}
-		 	    }
-	    }
-	   
+	    while(scannerline.hasNext()){
+ 	    	if (scannerline.hasNext("([0-9]+,){" + Integer.toString(boardSize-1)  + "," + Integer.toString(boardSize-1) + "}[0-9]+")){	
+ 		    	return true;
+ 	    	}else if(numtries > MAX_NUM_TRIES){
+ 	    		System.out.println("You have reached maximum number of attempts :( ");
+ 	    		return false;
+ 	    	} else{
+ 	    		numtries++;
+ 	    		input = scannerline.next();
+ 	    		System.out.println("Invalid input, enter row of numbers again");
+ 	    		continue;
+ 	    	}
+ 	    }
+	    
 	    return false;
 	}
 	
 	
-	protected static boolean verifyboard(SudokuGame game, int boardSize){
+	public static boolean verifyboard(SudokuGame game, int boardSize){
 		
 		int lastvalueinrow    = -100000;
 		int lastvalueincolumn = -100000;

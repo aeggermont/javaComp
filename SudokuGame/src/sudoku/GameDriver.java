@@ -17,7 +17,7 @@ public class GameDriver extends SodukuVerify{
 		int selection = 0;
 		boolean row = true;
 		Scanner scanner = new Scanner(System.in);
-		
+	
 		System.out.println("Chose how to enter the data: ");
 		System.out.println("\t 1) Row");
 		System.out.println("\t 2) Column");
@@ -27,19 +27,19 @@ public class GameDriver extends SodukuVerify{
 			if (scanner.hasNextInt()){
 				selection = scanner.nextInt();
 				
-				switch(selection){
-					case 1:
-						return true;
-					
-					case 2:
-						return false;
-					default:
-						System.out.println(" *** Invalid choice ***");
-						System.out.println("Chose how to enter the data: ");
-						System.out.println("\t 1) Row");
-						System.out.println("\t 2) Column");
-						System.out.println("\t Quit");
-					    continue;	
+				if (selection == 1){
+					row = true;
+					break;
+				}else if (selection == 2){
+					row = false;
+					break;
+				}else{
+					System.out.println(" *** Invalid choice ***");
+					System.out.println("Chose how to enter the data: ");
+					System.out.println("\t 1) Row");
+					System.out.println("\t 2) Column");
+					System.out.println("\t Quit");
+				    continue;	
 				}
 			}else{
 				String str = scanner.next();
@@ -105,7 +105,7 @@ public class GameDriver extends SodukuVerify{
 			}
 		}
 				
-		return selection;
+		return boardSize;
 	}
 	
 	
@@ -163,7 +163,6 @@ public class GameDriver extends SodukuVerify{
 		// TODO Auto-generated method stub
 		
 		int boardSize;
-		int inputchoice;
 		boolean row = true;
 		
 		System.out.println("**** Welcome to Sudoku Game ****");
@@ -179,6 +178,7 @@ public class GameDriver extends SodukuVerify{
 		game.displayBoard();
 		
 		playGame(game,boardSize, row);
+		
 				
 	}
 }
