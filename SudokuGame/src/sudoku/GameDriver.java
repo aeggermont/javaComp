@@ -4,15 +4,27 @@ import java.util.Scanner;
 
 /*
  * 
- * Homework 2
- * Antonio A. Eggermont
- * Sudoku Game Version 2
+ * GameDruver is the base class to start the SudokuGame. This class
+ * provide with user input functionality and instantiates a new
+ * game.
+ * 
+ * @author Antonio A. Eggermont
+ * @version 2.0  
  * 
  */
 
 public class GameDriver extends SodukuVerify{
 
-	private static boolean inputChoise(){
+	/*
+	 * Allows for the selection of input type for characters entered
+	 * by column or by row.  Program can exit if the option quit is
+	 * selected. 
+	 * 
+	 * @return true if input will be entered by row or false if input 
+	 *         will be entered by column
+	 * 
+	 */
+	private static boolean inputChoice(){
 		
 		int selection = 0;
 		boolean row = true;
@@ -61,7 +73,12 @@ public class GameDriver extends SodukuVerify{
 		return row;
 	}
 	
-	
+	/*
+	 * Allows for the selection of board size with two choices: 4x4 or 9x9
+	 * 
+	 * @return board size
+	 * 
+	 */
 	public static int setBoardSize(){
 		
 		int selection = 0;	
@@ -108,6 +125,16 @@ public class GameDriver extends SodukuVerify{
 		return boardSize;
 	}
 	
+	
+	/*
+	 * Initializes base game configuration and
+	 * start starts the Sudoku game. 
+	 * 
+	 * @param game a instance of the Sudoku game
+	 * @param boardSize the size for the board dimensions
+	 * @row true if input will be entered by row or false if input will be entered 
+	 *      by column. 
+	 */
 	
 	public static void playGame(SudokuGame game, int boardSize, boolean row){
 		
@@ -157,6 +184,7 @@ public class GameDriver extends SodukuVerify{
 	}
 	
 	/**
+	 * Main entry function for the game
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -169,7 +197,7 @@ public class GameDriver extends SodukuVerify{
 		System.out.println("  Let's play a game! :) ");
 		
 		boardSize = setBoardSize();
-		row = inputChoise();
+		row = inputChoice();
 		
 		System.out.println(row);
 		System.out.println(boardSize);
