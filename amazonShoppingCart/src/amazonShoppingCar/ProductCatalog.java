@@ -9,23 +9,15 @@ public class ProductCatalog
 	/*
 	 * Loading Kindle Fire Tablet Products
 	 */
-	
-	//private static Map<Integer, Product> KindleFireProducts = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> unlimitedInstantVideos = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> electronicsAndComputers = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> toysKidsBaby = new HashMap<Integer, Product>(); 
-	private static Map<Integer, Product> mp3sAndCloudPlayer = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> amazonFireTV = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> clothingShoesJewelry = new HashMap<Integer, Product>();
-	private static Map<Integer, Product> amazonCloudDrive = new HashMap<Integer, Product>();
-	private static HashMap KindleFireProducts     = new HashMap<Integer, Product>(20);
-	//private static HashMap unlimitedInstantVideos = new HashMap();
-	//private static HashMap electronicsAndComputers = new HashMap();
-	//private static HashMap toysKidsBaby = new HashMap();
-	//private static HashMap mp3sAndCloudPlayer = new HashMap();
-	//private static HashMap amazonFireTV = new HashMap();
-	//private static HashMap clothingShoesJewelry = new HashMap();
-	//private static HashMap amazonCloudDrive = new HashMap();
+		
+	private static HashMap KindleFireProducts = new HashMap();
+	private static HashMap unlimitedInstantVideos = new HashMap();
+	private static HashMap electronicsAndComputers = new HashMap();
+	private static HashMap toysKidsBaby = new HashMap();
+    private static HashMap mp3sAndCloudPlayer = new HashMap();
+	private static HashMap amazonFireTV = new HashMap();
+	private static HashMap clothingShoesJewelry = new HashMap();
+	private static HashMap amazonCloudDrive = new HashMap();
 
 	
 	public static void loadProducts(){
