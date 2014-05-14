@@ -1,67 +1,85 @@
 package amazonShoppingCar;
 
 /*
- *  Class Product
- *  Description: This class represents a product that has been added in a product catalog
- *               to be available for shoppers in a shopping cart
+ *  This class represents a product that can be added in a product catalog
+ *  to be available for shoppers in a shopping cart
+ *               
+ * @author Antonio A. Eggermont
+ * @version 1.0  
  */
 
 public class Product {
 
 	private String name;
-	private int id;
+	private int sn;
 	private double price;
-	private int inventory = 0;
 	
-	public Product(String name, int id, double price, int inventory){
+	/*
+	 * Constructor for invocation of class Product by a sub class.
+	 * 
+	 * @param name the name of the product
+	 * @param id   an assigned id for the product
+	 * @param price a price for the product
+	 * @param number of items in the inventory  
+	 */
+	public Product(String name, int sn, double price){
 		this.name = name;
-		this.id = id;
+		this.sn = sn;
 		this.price = price;
-		this.inventory = inventory;
 	}
 	
+	/*
+	 * Gets the name of a product
+	 * 
+	 * @return the name of the product
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/*
+	 * Sets the price for a product
+	 * 
+	 * @param price the price in dollars for a product
+	 */
 	public void setPrice(double price) {
 		this.price = price;
 	}
 	
-	public int getInventory() {
-		return inventory;
-	}
-
-	public void subtractInventory(int quantity) {
-		this.inventory = inventory - quantity;
-	}
-	
-	public void addInventory(int quanity){
-		this.inventory += quanity;
-	}
-	
+	/*
+	 * Gets the price set for a product
+	 * 
+	 * @return price the value set for a product
+	 */
 	public double getPrice() {
 		return price;
 	}
 
+	/*
+	 * Sets or updates the name of a product
+	 * 
+	 * @param name a name for the product
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-
-	/**
-	 * @param args
+	/*
+	 * Gets the serial number set for a product
+	 * 
+	 * @return sn the serial number set for a product
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public int getSerialNumber() {
+		return sn;
+	}
 
+	/*
+	 * Sets or updates the serial number for a product
+	 * 
+	 * @param sn te serial number for a product
+	 * 
+	 */
+	public void setSerialNumber(int sn) {
+		this.sn = sn;
 	}
 }

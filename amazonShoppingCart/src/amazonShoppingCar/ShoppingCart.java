@@ -3,10 +3,17 @@ package amazonShoppingCar;
 import java.util.*;
 
 /*
- * A class to anstract a shopping cart for a product catalog
+ * A class to represent a shopping cart for a product catalog. 
+ * This class has the following functionality
+ * 
+ *<ul>
+ *<li> Create an instance of a product catalog
+ *<li> Add a product to the shopping cart
+ *<li> Return the total num,ber of items in the shopping cart
+ *</ul>
  * 
  * @author Antonio A. Eggermont
- * @version 2.0  
+ * @version 1.0  
  * 
  */
 
@@ -52,7 +59,6 @@ public class ShoppingCart extends ProductCatalog{
 	 */
 	public static double getTotalAmmountInCart(){
 		
-		// (Product)item.getValue()).getName()
 		double total = 0;
 
 		for( int i=0; i < shoppingCart.size() ; i++){
@@ -82,10 +88,9 @@ public class ShoppingCart extends ProductCatalog{
 		System.out.println(product2.getName());
 		System.out.println(product2.getPrice());
 		
+		System.out.println("============================");
 		System.out.println(getNumItemsInCart());
-		
 		System.out.println(getTotalAmmountInCart());
-		
-		
+		System.out.println("============================");
 	}
 }
