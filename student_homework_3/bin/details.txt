@@ -1,0 +1,15 @@
+* Create a product database by leveraging one or more classes from collection 
+  framework to store the instances of the Product class.
+    
+* Use class ProductDBImpl.java in server package as the starting point for an 
+  implementation of the interface ProductDB.  
+  
+* The addProduct method should generate a unique number and assign it to the newly created product.  One approach is to
+  use a static variable as a counter.
+  
+* Make sure to read the javadoc of each methods in ProductDB.java and your implementation should
+  match the description and contract
+
+* DO NOT MODIFY ANYTHING IN THE ProductDB.java INTERFACE
+
+* DO NOT MODIFY ANYTHING IN METHOD testProductServer of ProductDBClient CLASS
