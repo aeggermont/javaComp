@@ -10,21 +10,17 @@ import productdb.ProductDB;
 import productdb.ProductNotFoundException;
 
 
-
 /**
  * Implementation of ProductDB that stores products in memory
  * 
- * @author hluu
+ * @author Antonio Eggermont
  *
  */
 public class ProductDBImpl implements ProductDB {
 
-	private static List<Product> productList = new ArrayList<Product>();
-	
 	private static Map<Integer, Product> productCatalog = new HashMap<Integer, Product>();
 	private static int lastProductIdAdded = 0;
-	
-	
+		
 	/**
 	 * Retrieve product by primary key
 	 * @param productId
