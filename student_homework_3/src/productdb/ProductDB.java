@@ -54,4 +54,17 @@ public interface ProductDB {
 	 */
 	void deleteProduct(int productId) throws ProductNotFoundException;
 	
+    /**
+     * Save the existing products in the database into a file.
+     * An implementation of this class decides which File I/O 
+     * technique to use and the location of the file.
+     */
+    public void saveProductsToDisk();
+	
+    /**
+     * Load the products from a file.  An implementation of this
+     * class decides where to read the products from.
+     */
+    public void loadProductsFromDisk();
+    
 }

@@ -9,6 +9,19 @@ import productdb.ProductAlreadyExistsException;
 import productdb.ProductDB;
 import productdb.ProductNotFoundException;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+
 
 /**
  * Implementation of ProductDB that stores products in memory
@@ -109,6 +122,7 @@ public class ProductDBImpl implements ProductDB {
 		
 		for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()){
 			if ((entry.getValue().getName() == product.getName())){
+				product.setId(entry.getKey());
 				entry.setValue(product);
 				return;
 			}
@@ -132,6 +146,78 @@ public class ProductDBImpl implements ProductDB {
 		}
 	}
 
+    /**
+     * Save the existing products in the database into a file.
+     * An implementation of this class decides which File I/O 
+     * technique to use and the location of the file.
+     */
+	@Override
+    public void saveProductsToDisk() {
+		
+		String binaryProductDemo = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
+        File outputFile = new File(binaryProductDemo);
+        
+        DataOutputStream out;       
+        
+        try {
+        	out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
+        	
+        	for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()) {
+        		out.writeLong(entry.getKey());
+            	out.writeUTF(entry.getValue().getName());
+            	out.writeDouble(entry.getValue().getPrice());
+            	out.writeUTF(entry.getValue().getDept().name());
+            	System.out.print("Product Saved:  ");
+                System.out.println(entry.getValue());
+        	}
+ 	
+        	out.close();
+        
+        } catch (FileNotFoundException e){
+         	e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+	
+    /**
+     * Load the products from a file.  An implementation of this
+     * class decides where to read the products from.
+     */
+	@SuppressWarnings("deprecation")
+	@Override
+    public void loadProductsFromDisk() {
+				
+		String binaryFileIn = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
+    	File fileIn = new File(binaryFileIn);
+    	
+    	try{
+    		DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileIn)));	
+    		BufferedReader d = new BufferedReader(new InputStreamReader(in));
+            Integer index =0;
+    	    while ( index < 3){
+    	    	
+    	    	long pk = in.readLong();
+    	    	//String code = in.readUTF();
+    	    	String desc = in.readUTF();
+    	    	double price = in.readDouble();
+			
+    	    	System.out.println(pk);	
+    	    	//System.out.println(code);
+    	    	System.out.println(desc);
+    	    	System.out.println(price);
+    	    	index += 1;
+    	    }
+    	    
+    		in.close();
+    		
+    	}catch(IOException e){
+    		e.printStackTrace();
+    	}
+		
+    }
+    
+	
 	/**
 	 * @param args
 	 */
@@ -169,7 +255,7 @@ public class ProductDBImpl implements ProductDB {
 			System.out.println("Unable to add product " + mes);
 		}
 		
-		System.exit(0);
+
 		
 		System.out.println("===== Lists All Products ================");
 		
@@ -214,6 +300,9 @@ public class ProductDBImpl implements ProductDB {
 			System.out.println(item.getPrice());		
 		}
 		
+		System.out.println("===== Testing Binary File Writes ================");
+		
+		productDB.saveProductsToDisk();
+		productDB.loadProductsFromDisk();
 	}
-
 }
