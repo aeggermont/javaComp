@@ -1,0 +1,7 @@
+1|ELECTRONICS|126.0|ipod1
+2|ELECTRONICS|127.3|ipod2
+4|COMPUTER|900.9|ipod4
+5|ELECTRONICS|122.6|ipod5
+6|BOOK|400.23|The Lord of the Rings 1
+7|BOOK|410.23|The Lord of the Rings 2
+8|BOOK|420.23|The Lord of the Rings 3

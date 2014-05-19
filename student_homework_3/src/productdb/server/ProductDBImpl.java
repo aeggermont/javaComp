@@ -22,6 +22,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 
 /**
  * Implementation of ProductDB that stores products in memory
@@ -154,66 +163,54 @@ public class ProductDBImpl implements ProductDB {
 	@Override
     public void saveProductsToDisk() {
 		
-		String binaryProductDemo = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
-        File outputFile = new File(binaryProductDemo);
-        
-        DataOutputStream out;       
-        
-        try {
-        	out = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outputFile)));
+		String fileOut = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.txt";
+            
+        try{
+        	PrintWriter fd = new PrintWriter(new BufferedWriter(new FileWriter(fileOut)));
         	
-        	for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()) {
-        		out.writeLong(entry.getKey());
-            	out.writeUTF(entry.getValue().getName());
-            	out.writeDouble(entry.getValue().getPrice());
-            	out.writeUTF(entry.getValue().getDept().name());
-            	System.out.print("Product Saved:  ");
-                System.out.println(entry.getValue());
+        	for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()){
+        		fd.print(entry.getKey());
+        		fd.print("|");
+        		fd.print(entry.getValue().getDept().name());
+        		fd.print("|");
+        		fd.print(entry.getValue().getPrice());
+        		fd.print("|");
+        		fd.println(entry.getValue().getName());
         	}
- 	
-        	out.close();
-        
-        } catch (FileNotFoundException e){
-         	e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
+        	
+        	fd.close();
+        } catch(IOException e){
+        	e.printStackTrace();
         }
+        
+		
     }
 	
     /**
      * Load the products from a file.  An implementation of this
      * class decides where to read the products from.
      */
-	@SuppressWarnings("deprecation")
 	@Override
     public void loadProductsFromDisk() {
-				
-		String binaryFileIn = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
-    	File fileIn = new File(binaryFileIn);
-    	
-    	try{
-    		DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(fileIn)));	
-    		BufferedReader d = new BufferedReader(new InputStreamReader(in));
-            Integer index =0;
-    	    while ( index < 3){
-    	    	
-    	    	long pk = in.readLong();
-    	    	//String code = in.readUTF();
-    	    	String desc = in.readUTF();
-    	    	double price = in.readDouble();
+		
+		File fileIn = new File ("/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.txt");
+
+		if (fileIn.exists()){
 			
-    	    	System.out.println(pk);	
-    	    	//System.out.println(code);
-    	    	System.out.println(desc);
-    	    	System.out.println(price);
-    	    	index += 1;
-    	    }
-    	    
-    		in.close();
-    		
-    	}catch(IOException e){
-    		e.printStackTrace();
-    	}
+			try{
+				BufferedReader in = new BufferedReader(new FileReader(fileIn));
+				String line = null;
+				
+				while((line = in.readLine()) != null){
+					System.out.println(line);
+				}
+				
+				in.close();
+				
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
 		
     }
     
@@ -300,9 +297,12 @@ public class ProductDBImpl implements ProductDB {
 			System.out.println(item.getPrice());		
 		}
 		
-		System.out.println("===== Testing Binary File Writes ================");
+		System.out.println("===== Saving Data to Disk ================");
 		
 		productDB.saveProductsToDisk();
+		
+		System.out.println("===== Loading Data to Database ================");
+
 		productDB.loadProductsFromDisk();
 	}
 }
