@@ -1,6 +1,7 @@
 package productdb;
+import java.io.Serializable;
 
-public class Product {
+public class Product implements Serializable {
 	private Integer id;
 	private String name;
 	private double price;

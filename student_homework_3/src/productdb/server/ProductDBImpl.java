@@ -8,6 +8,8 @@ import productdb.Product;
 import productdb.ProductAlreadyExistsException;
 import productdb.ProductDB;
 import productdb.ProductNotFoundException;
+import java.io.FileNotFoundException;
+import java.io.EOFException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedInputStream;
@@ -18,6 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -159,58 +163,56 @@ public class ProductDBImpl implements ProductDB {
      * Save the existing products in the database into a file.
      * An implementation of this class decides which File I/O 
      * technique to use and the location of the file.
+     * @throws 
      */
 	@Override
     public void saveProductsToDisk() {
 		
-		String fileOut = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.txt";
-            
-        try{
-        	PrintWriter fd = new PrintWriter(new BufferedWriter(new FileWriter(fileOut)));
+		String fileOut = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
+                  
+        try {
         	
-        	for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()){
-        		fd.print(entry.getKey());
-        		fd.print("|");
-        		fd.print(entry.getValue().getDept().name());
-        		fd.print("|");
-        		fd.print(entry.getValue().getPrice());
-        		fd.print("|");
-        		fd.println(entry.getValue().getName());
-        	}
-        	
-        	fd.close();
-        } catch(IOException e){
-        	e.printStackTrace();
-        }
+			ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream(fileOut));
+
+			for (Map.Entry<Integer, Product>entry : productCatalog.entrySet()){
+				output.writeObject((Product)entry.getValue());
+				//System.out.println(entry.getValue());
+			}	
+			output.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         
-		
     }
 	
     /**
      * Load the products from a file.  An implementation of this
      * class decides where to read the products from.
+     * @throws 
      */
 	@Override
-    public void loadProductsFromDisk() {
+    public void loadProductsFromDisk()  throws IOException{
 		
-		File fileIn = new File ("/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.txt");
+		File fileIn = new File ("/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin");
+		boolean endOfFile = false;
+		
+		ObjectInputStream input = new ObjectInputStream(new FileInputStream(fileIn));
 
-		if (fileIn.exists()){
+		while(!endOfFile){
 			
 			try{
-				BufferedReader in = new BufferedReader(new FileReader(fileIn));
-				String line = null;
-				
-				while((line = in.readLine()) != null){
-					System.out.println(line);
-				}
-				
-				in.close();
-				
-			}catch(IOException e){
+				Product temp = (Product)input.readObject();
+				System.out.println(temp.getName());	
+			}catch (EOFException e){
+				endOfFile = true; 
+			}catch (IOException e){
+				e.printStackTrace();
+			}catch (ClassNotFoundException e){
 				e.printStackTrace();
 			}
 		}
+		
+	    input.close();		
 		
     }
     
@@ -218,7 +220,7 @@ public class ProductDBImpl implements ProductDB {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
 		ProductDB productDB = null;
@@ -303,6 +305,11 @@ public class ProductDBImpl implements ProductDB {
 		
 		System.out.println("===== Loading Data to Database ================");
 
-		productDB.loadProductsFromDisk();
+		try{
+			productDB.loadProductsFromDisk();
+		} catch ( IOException e){
+			e.printStackTrace();
+		}
+		
 	}
 }

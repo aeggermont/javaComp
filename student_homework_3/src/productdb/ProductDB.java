@@ -1,5 +1,6 @@
 package productdb;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -64,7 +65,8 @@ public interface ProductDB {
     /**
      * Load the products from a file.  An implementation of this
      * class decides where to read the products from.
+     * @throws IOException 
      */
-    public void loadProductsFromDisk();
+    public void loadProductsFromDisk() throws IOException;
     
 }
