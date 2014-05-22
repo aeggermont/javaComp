@@ -45,8 +45,24 @@ import java.io.FileReader;
 public class ProductDBImpl implements ProductDB {
 
 	private static Map<Integer, Product> productCatalog = new HashMap<Integer, Product>();
+	private static final String FILE_NAME = "productDB.bin";
 	private static int lastProductIdAdded = 0;
 		
+	/**
+	 * Constructs a path to store and load products  
+	 * 
+	 * @return full qualified path name to read and write to the product catalog file
+	 */
+	private static String buildPathFileName() {
+		String fileName = System.getProperty("user.home");
+		fileName = fileName + System.getProperty("file.separator");
+		fileName = fileName + FILE_NAME;
+		System.out.format("Setting output path to: %s \n",  fileName);
+		
+		return fileName;
+	}
+	
+	
 	/**
 	 * Retrieve product by primary key
 	 * @param productId
@@ -168,7 +184,7 @@ public class ProductDBImpl implements ProductDB {
 	@Override
     public void saveProductsToDisk() {
 		
-		String fileOut = "/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin";
+		String fileOut = buildPathFileName();
                   
         try {
         	
@@ -191,18 +207,17 @@ public class ProductDBImpl implements ProductDB {
      * @throws 
      */
 	@Override
-    public void loadProductsFromDisk()  throws IOException{
+    public void loadProductsFromDisk()  throws IOException, FileNotFoundException{
 		
-		File fileIn = new File ("/Users/alberttsoi/dev/UCSC-JavaComp/student_homework_3/productDB.bin");
+		File fileIn = new File (buildPathFileName());
 		boolean endOfFile = false;
 		
 		ObjectInputStream input = new ObjectInputStream(new FileInputStream(fileIn));
 
 		while(!endOfFile){
-			
 			try{
-				Product temp = (Product)input.readObject();
-				System.out.println(temp.getName());	
+				Product tmpProd = (Product)input.readObject();
+				productCatalog.put(tmpProd.getId(), tmpProd);
 			}catch (EOFException e){
 				endOfFile = true; 
 			}catch (IOException e){
@@ -213,7 +228,6 @@ public class ProductDBImpl implements ProductDB {
 		}
 		
 	    input.close();		
-		
     }
     
 	
@@ -226,6 +240,16 @@ public class ProductDBImpl implements ProductDB {
 		ProductDB productDB = null;
 		productDB = new ProductDBImpl();
 	
+		
+		System.out.println("===== Loading Data to Database ================");
+
+		try{
+			productDB.loadProductsFromDisk();
+		} catch ( IOException e){
+			e.printStackTrace();
+		}
+		
+		/*
 		try{
 			productDB.addProduct(new Product("ipod1", 126.0, DeptCode.ELECTRONICS));
 			productDB.addProduct(new Product("ipod2", 127.3, DeptCode.ELECTRONICS));
@@ -238,23 +262,7 @@ public class ProductDBImpl implements ProductDB {
 		} catch (ProductAlreadyExistsException mes) {
 			System.out.println("Unable to add product " + mes);
 		}
-		
-		System.out.println("===== Products by Department ================");
-		
-		for (Product item : productDB.getProductsByDept(DeptCode.BOOK)){
-			System.out.println("-------------------------");
-			System.out.println(item.getName());
-			System.out.println(item.getId());
-			System.out.println(item.getPrice());	
-		}
-		
-		try{
-		    productDB.addProduct(new Product("ipod1", 126.0, DeptCode.ELECTRONICS));
-		} catch (ProductAlreadyExistsException mes) {
-			System.out.println("Unable to add product " + mes);
-		}
-		
-
+		*/
 		
 		System.out.println("===== Lists All Products ================");
 		
@@ -265,51 +273,12 @@ public class ProductDBImpl implements ProductDB {
 			System.out.println(item.getPrice());		
 		}
 		
-		try{
-			productDB.deleteProduct(3);
-		} catch (ProductNotFoundException mesg){
-			System.out.println(mesg);
-		}
-		
-		System.out.println("===== Lists All Products (Again) ================");
-		
-		for (Product item: productDB.getAllProducts()){
-			System.out.println("-------------------------");
-			System.out.println(item.getName());
-			System.out.println(item.getId());
-			System.out.println(item.getPrice());		
-		}
-		
-		System.out.println("===== Updating Product ================");
-		
-		Product updatedItem = new Product("ipod4", 900.90, DeptCode.COMPUTER);
-		
-		try {
-			productDB.updateProduct(updatedItem);
-		} catch(ProductNotFoundException mesg ){
-			System.out.println(mesg);
-		}
-		
-		System.out.println("===== Lists All Products (Again) ================");
-		
-		for (Product item: productDB.getAllProducts()){
-			System.out.println("-------------------------");
-			System.out.println(item.getName());
-			System.out.println(item.getId());
-			System.out.println(item.getPrice());		
-		}
-		
 		System.out.println("===== Saving Data to Disk ================");
 		
-		productDB.saveProductsToDisk();
+		//productDB.saveProductsToDisk();
 		
-		System.out.println("===== Loading Data to Database ================");
-
-		try{
-			productDB.loadProductsFromDisk();
-		} catch ( IOException e){
-			e.printStackTrace();
-		}
+		
+		
 		
 	}
 }
