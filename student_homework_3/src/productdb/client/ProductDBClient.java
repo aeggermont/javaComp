@@ -27,7 +27,32 @@ import java.io.PrintWriter;
  */
 public class ProductDBClient implements ProductDB {
 
-	public static final int PORT_NO = 8888;
+	public static final int PORT_NO = 8900;
+	private static Socket socket_fd;
+	
+	public ProductDBClient(){
+		
+		startServer();
+	}
+	
+	public void startServer(){
+		
+		try{
+			socket_fd = new Socket("localhost", PORT_NO);
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+	
+	public void stopServer(){
+		
+		try{
+			socket_fd.close();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+	
 	
 	@Override
 	public Product getProduct(int productId) {
@@ -50,7 +75,31 @@ public class ProductDBClient implements ProductDB {
 	@Override
 	public void addProduct(Product product)
 			throws ProductAlreadyExistsException {
-		// TODO Auto-generated method stub
+		
+		String mesg = null;
+        //System.out.println(product.getName());
+        //System.out.println(product.getPrice());
+        //System.out.println(product.getDept().name());
+        
+        mesg = "ADD " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
+        System.out.println(mesg);
+		
+        try {
+        	
+        	BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+        	PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+        	pw.println(mesg);
+        	pw.flush();
+        	
+        	String line = reader.readLine();
+			reader.close();
+			System.out.println("results: " + line);
+        	
+            socket_fd.close();
+            
+        } catch ( IOException e){
+        	e.printStackTrace();
+        }
 
 	}
 
@@ -115,11 +164,11 @@ public class ProductDBClient implements ProductDB {
 		productDB = new ProductDBClient();
 		
 		try {
-			Socket socket = new Socket("localhost", ProductDBClient.PORT_NO);
-			productDB.quitServer(socket);
-		} catch (IOException e){
+			productDB.addProduct( new Product("ipodX", 130.0, DeptCode.ELECTRONICS));
+			//productDB.quitServer(socket);
+		} catch (ProductAlreadyExistsException e){
 			e.printStackTrace();
-		}	
+		}
 	}
 
 }
