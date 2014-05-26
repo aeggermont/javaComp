@@ -1,6 +1,7 @@
 package productdb;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 
 /**
@@ -68,5 +69,7 @@ public interface ProductDB {
      * @throws IOException 
      */
     public void loadProductsFromDisk() throws IOException;
+ 
     
+    public void quitServer(Socket socket) throws IOException;
 }

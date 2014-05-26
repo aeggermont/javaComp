@@ -40,7 +40,7 @@ import java.net.Socket;
  * @author Antonio Eggermont
  *
  */
-public class ProductDBImpl implements ProductDB {
+public class ProductDBServer implements ProductDB {
 
 	private static Map<Integer, Product> productCatalog = new HashMap<Integer, Product>();
 	private static final String FILE_NAME = "productDB.bin";
@@ -238,6 +238,21 @@ public class ProductDBImpl implements ProductDB {
 		
 	}
 	
+	
+	private static void processRequest(Socket socket, String line) {
+		// TODO Auto-generated method stub
+		
+		System.out.println("About to process request: " + line);
+		
+	    try {
+	    	socket.close();
+	    	System.exit(0);
+	    } catch(IOException e){
+	    	e.printStackTrace();
+	    }
+		
+	}
+	
 	/**
 	 * @param args
 	 */
@@ -245,7 +260,7 @@ public class ProductDBImpl implements ProductDB {
 		// TODO Auto-generated method stub
 		
 		ProductDB productDB = null;
-		productDB = new ProductDBImpl();
+		productDB = new ProductDBServer();
 
 		System.out.println(" ****** Loading Data to Database ******");
 
