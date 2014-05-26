@@ -30,18 +30,24 @@ public class ProductDBClient implements ProductDB {
 	public static final int PORT_NO = 8900;
 	private static Socket socket_fd;
 	
-	public ProductDBClient(){
-		
-		startServer();
-	}
 	
-	public void startServer(){
+	public void connectToServer(){
 		
 		try{
 			socket_fd = new Socket("localhost", PORT_NO);
 		} catch (IOException e){
 			e.printStackTrace();
 		}
+	}
+	
+		
+	public void closeConnection(){
+		try{
+			socket_fd.close();
+		} catch (IOException e){
+			e.printStackTrace();
+			System.exit(1);
+		}		
 	}
 	
 	public void stopServer(){
@@ -56,8 +62,31 @@ public class ProductDBClient implements ProductDB {
 	
 	@Override
 	public Product getProduct(int productId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		String mesg = null;
+		mesg = "SEARCH " + String.valueOf(productId) + ",";
+		Product prodInfo = null;
+		connectToServer();
+		
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(mesg);
+			pw.flush();
+			
+			String result = reader.readLine();
+			reader.close();
+			System.out.println(result);
+            
+			
+		}catch ( IOException e){
+			e.printStackTrace();
+			return null;
+		}finally{
+			closeConnection();
+		}
+		
+		return prodInfo;
 	}
 
 	@Override
@@ -76,14 +105,11 @@ public class ProductDBClient implements ProductDB {
 	public void addProduct(Product product)
 			throws ProductAlreadyExistsException {
 		
-		String mesg = null;
-        //System.out.println(product.getName());
-        //System.out.println(product.getPrice());
-        //System.out.println(product.getDept().name());
-        
+		String mesg = null;       
         mesg = "ADD " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
         System.out.println(mesg);
-		
+        connectToServer();
+        
         try {
         	
         	BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
@@ -94,25 +120,67 @@ public class ProductDBClient implements ProductDB {
         	String line = reader.readLine();
 			reader.close();
 			System.out.println("results: " + line);
-        	
-            socket_fd.close();
-            
+                 
         } catch ( IOException e){
         	e.printStackTrace();
+        }finally{
+        	closeConnection();
         }
 
 	}
 
 	@Override
 	public void updateProduct(Product product) throws ProductNotFoundException {
-		// TODO Auto-generated method stub
-
+		
+		String mesg = null;
+		mesg = "UPDATE " + product + ",";
+		
+		System.out.println(mesg);
+		
+		connectToServer();
+		
+		try{
+			BufferedReader reader = new BufferedReader( new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(mesg);
+			pw.flush();
+			
+			String line = reader.readLine();
+			reader.close();
+			
+			System.out.println("results: " + line);
+		} catch (IOException e){
+			e.printStackTrace();
+		}finally{
+			closeConnection();
+		}
+		
 	}
 
 	@Override
 	public void deleteProduct(int productId) throws ProductNotFoundException {
-		// TODO Auto-generated method stub
-
+		
+		String mesg = null;
+		mesg = "DELETE " + String.valueOf(productId);
+		
+		System.out.println(mesg);
+		connectToServer();
+		
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+        	pw.println(mesg);
+        	pw.flush();
+        	
+        	String line = reader.readLine();
+        	reader.close();
+        	System.out.println("results: " + line);
+        	
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			closeConnection();
+		}
 	}
 
     @Override
@@ -137,11 +205,7 @@ public class ProductDBClient implements ProductDB {
     	Date d = Calendar.getInstance().getTime();
     	msg = "QUIT [" + d + "]";
     	
-    	System.out.println("About to send message ... ");
-    	System.out.println(msg);
-    	
     	BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
     	PrintWriter pw = new PrintWriter(socket.getOutputStream());
     	pw.println(msg);
     	pw.flush();
@@ -163,12 +227,23 @@ public class ProductDBClient implements ProductDB {
 		ProductDB productDB = null;
 		productDB = new ProductDBClient();
 		
+		Product updatedProd = new Product("ipod1", 200.00, DeptCode.ELECTRONICS);
+		
+		
 		try {
-			productDB.addProduct( new Product("ipodX", 130.0, DeptCode.ELECTRONICS));
+			productDB.getProduct(5);
+			productDB.addProduct( new Product("ipodX1", 131.0, DeptCode.ELECTRONICS));
+			productDB.deleteProduct(1);
+			productDB.updateProduct(updatedProd);
+			//productDB.getProduct(productId);
 			//productDB.quitServer(socket);
 		} catch (ProductAlreadyExistsException e){
 			e.printStackTrace();
+		} catch ( ProductNotFoundException e){
+			e.printStackTrace();
 		}
+		
+		
 	}
 
 }

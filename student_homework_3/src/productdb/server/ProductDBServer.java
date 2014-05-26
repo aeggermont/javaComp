@@ -5,6 +5,7 @@ import java.io.IOException;
 import productdb.DeptCode;
 import productdb.ProductDB;
 import productdb.Product;
+import productdb.ProductNotFoundException;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -78,7 +79,6 @@ public class ProductDBServer extends ProductDBImpl{
 		Date ts = Calendar.getInstance().getTime();
 		
 		
-		
 		switch(task){
 		
 		case ADD:
@@ -103,19 +103,35 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		case UPDATE:
 			System.out.println("About to update a product");
-			results = "[OK] About to add a product " + "[" + ts + "]";
+			results = "[OK] About to update a product " + "[" + ts + "]";
+			System.out.println(productParams[0]);
+			System.out.println(productParams[1]);
+			System.out.println(productParams[2]);
+			System.out.println(productParams[3]);
+			
 			break;
 		case DELETE:
 			System.out.println("About to delete a product");
-			results = "[OK] About to add a product " + "[" + ts + "]";
+			
+			try{
+				deleteProduct(Integer.parseInt(productParams[0]));
+				
+			} catch(ProductNotFoundException e) {
+				e.printStackTrace();
+				results = "[ERROR] product does not exist ";
+				break;
+			}
+			
+			results = "[OK] Deleted " + "[" + ts + "]";
 			break;
+			
 		case LIST:
 			System.out.println("About to list all products");
 			results = "[OK] About to add a product " + "[" + ts + "]";
 			break;
 		case SEARCH:
-			System.out.println("About to find a product");
-			results = "[OK] About to add a product " + "[" + ts + "]";
+			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
+			results = "[OK] " + prodInfo;
 			break;
 		default:
 			pw.println("[ERROR[ invalid command: " + mesg);
@@ -165,7 +181,12 @@ public class ProductDBServer extends ProductDBImpl{
 				productDB.processRequest(socket, line);
 			} catch (IOException e){
 				e.printStackTrace();
-			} 
+			} finally{
+				for( Product item: productDB.getAllProducts()){
+					System.out.println("==========");
+					System.out.println(item);
+				}
+			}
 		}
 		
 		
