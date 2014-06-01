@@ -105,6 +105,9 @@ public class ProductDBServer extends ProductDBImpl{
 			
 			results = "[OK] added product " + prod + " [" + ts + "]";
 			System.out.println(results);
+			pw.println(results);
+			pw.flush();
+			
 			break;
 			
 		case UPDATE:
@@ -121,6 +124,9 @@ public class ProductDBServer extends ProductDBImpl{
 			}
 			
 			results = "[OK] Product updated " + "[" + ts + "]";
+			pw.println(results);
+			pw.flush();
+			
 			break;
 			
 		case DELETE:
@@ -136,6 +142,8 @@ public class ProductDBServer extends ProductDBImpl{
 			}
 			
 			results = "[OK] Deleted " + "[" + ts + "]";
+			pw.println(results);
+			pw.flush();
 			break;
 			
 		case LIST:
@@ -145,16 +153,23 @@ public class ProductDBServer extends ProductDBImpl{
 			List<Product> productList = new ArrayList<Product>();	
 			productList = getAllProducts(); 
 	
+			pw.println(results);
+			pw.flush();
+			
 			for( Product item: productList){
 				System.out.println(item);
-				results = results + item + "\n"; 
+				pw.println(item);
+				pw.flush();
+				results = item + "\n";
 			}
-			
 			break;
 			
 		case SEARCH:
 			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
 			results = "[OK] " + prodInfo;
+			pw.println(results);
+			pw.flush();
+			
 			break;
 		default:
 			pw.println("[ERROR[ invalid command: " + mesg);
@@ -164,9 +179,6 @@ public class ProductDBServer extends ProductDBImpl{
 		}
 		
 		System.out.println("sent back result: " + results );
-		
-		pw.println(results);
-		pw.flush();
 		socket.close();
 	    return;
 	}

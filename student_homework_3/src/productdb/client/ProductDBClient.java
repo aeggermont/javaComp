@@ -119,21 +119,25 @@ public class ProductDBClient implements ProductDB {
 			
 			System.out.println("results: " + line);
 			
+			// IF not [ERROR] in results
+			
 			while(true){
 				line = reader.readLine();
 				if ( line == null) { break; }
 				
 				tokens = line.split(",");
 				
-				// Integer id, String name, double price, DeptCode code
-				
 				if ( tokens.length == 4){
-					System.out.println(tokens[1].split(":")[1]);
 					
-					products.add(new Product(Integer.parseInt(tokens[0].split(":")[1]), 
-											 tokens[1].split(":")[1], 
-							                 Double.parseDouble(tokens[2].split(":")[1]), 
-							                 DeptCode.valueOf(tokens[3].split(":")[1])));
+					// System.out.println(tokens[0].split(":")[1]);
+					// System.out.println(tokens[1].split(":")[1]);
+					// System.out.println(tokens[3].split(":")[1]);
+					// System.out.println((DeptCode.valueOf(tokens[2].split(":")[1])));
+					
+					products.add(new Product ( Integer.parseInt(tokens[0].split(":")[1]),
+											   tokens[1].split(":")[1],
+											   Double.parseDouble(tokens[3].split(":")[1]),
+											   DeptCode.valueOf(tokens[2].split(":")[1]) ));
 				}
 			}
 			
@@ -282,25 +286,21 @@ public class ProductDBClient implements ProductDB {
 			productDB.addProduct( new Product("ipodX1", 131.0, DeptCode.ELECTRONICS));
 			productDB.getAllProducts();
 			productDB.deleteProduct(1);
-			//productDB.getAllProducts();
 			//productDB.updateProduct(updatedProd);
-			//productDB.getProduct(productId);
+			
 			//productDB.quitServer(socket);
 		} catch (ProductAlreadyExistsException e){
 			e.printStackTrace();
 		} catch ( ProductNotFoundException e){
 			e.printStackTrace();
 		}
-		
-		
+			
 		for (Product item: productDB.getAllProducts()){
 			System.out.println("-------------------------");
 			System.out.println(item.getName());
 			System.out.println(item.getId());
 			System.out.println(item.getPrice());		
-		}
-		
-		
+		}		
 	}
 
 }
