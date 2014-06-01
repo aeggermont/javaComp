@@ -113,17 +113,26 @@ public class ProductDBServer extends ProductDBImpl{
 		case UPDATE:
 			System.out.println("About to update a product");
 			
-			Product prodUpdated = new Product(Integer.parseInt(productParams[0]), 
-					                          productParams[1], 
+			System.out.println(productParams[0]);
+			System.out.println(productParams[1]);
+			System.out.println(productParams[2]);
+			
+		    System.out.println(productParams[0]); 
+		    System.out.println(Double.parseDouble(productParams[2]));
+		    System.out.println(DeptCode.valueOf(productParams[1]));
+		    				
+			Product prodUpdated = new Product(productParams[0], 
 					                          Double.parseDouble(productParams[2]), 
-					                          DeptCode.valueOf(productParams[3]));
+					                          DeptCode.valueOf(productParams[1]));
+			
 			try{
 				updateProduct(prodUpdated);
+				results = "[OK] Product updated " + "[" + ts + "]";
 			}catch (ProductNotFoundException e){
+				results = "[ERROR] ProductNotFound " + "[" + ts + "]";
 				e.printStackTrace();
 			}
 			
-			results = "[OK] Product updated " + "[" + ts + "]";
 			pw.println(results);
 			pw.flush();
 			

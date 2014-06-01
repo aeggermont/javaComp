@@ -148,12 +148,29 @@ public class ProductDBImpl implements ProductDB {
 	@Override
 	public void updateProduct(Product product) throws ProductNotFoundException {
 		
+		System.out.println("Searching for: " + product.getName());
+		
+		
 		for( Map.Entry<Integer, Product>entry : productCatalog.entrySet()){
+			System.out.println("-----------------");
+			System.out.println(entry.getValue().getName());
+			System.out.println(product.getName());
+			
+			// System.out.println(entry.getValue().getName().compareToIgnoreCase(product.getName()));
+			
+			if ( entry.getValue().getName().equals(product.getName())){
+				product.setId(entry.getKey());
+				entry.setValue(product);
+				return;
+			}
+			
+			/*
 			if ((entry.getValue().getName() == product.getName())){
 				product.setId(entry.getKey());
 				entry.setValue(product);
 				return;
 			}
+			*/
 		}
 		
 		throw new ProductNotFoundException("Product %s does not exist!");

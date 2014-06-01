@@ -184,10 +184,8 @@ public class ProductDBClient implements ProductDB {
 	public void updateProduct(Product product) throws ProductNotFoundException {
 		
 		String mesg = null;
-		mesg = "UPDATE " + product + ",";
-		
+		mesg = "UPDATE " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
 		System.out.println(mesg);
-		
 		connectToServer();
 		
 		try{
@@ -273,24 +271,23 @@ public class ProductDBClient implements ProductDB {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		
 		ProductDB productDB = null;
 		productDB = new ProductDBClient();
 		
-		Product updatedProd = new Product("ipod1", 200.00, DeptCode.ELECTRONICS);
+		Product updatedProd = new Product("ipod3", 200.00, DeptCode.ELECTRONICS);
 		
 		
 		try {
+			productDB.updateProduct(updatedProd);
 			productDB.getProduct(5);
 			productDB.addProduct( new Product("ipodX1", 131.0, DeptCode.ELECTRONICS));
-			productDB.getAllProducts();
 			productDB.deleteProduct(1);
-			//productDB.updateProduct(updatedProd);
+			productDB.getAllProducts();
 			
 			//productDB.quitServer(socket);
 		} catch (ProductAlreadyExistsException e){
-			e.printStackTrace();
+		//	e.printStackTrace();
 		} catch ( ProductNotFoundException e){
 			e.printStackTrace();
 		}
