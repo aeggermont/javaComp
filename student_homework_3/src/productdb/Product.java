@@ -53,7 +53,7 @@ public class Product implements Serializable {
 
 	@Override
 	public String toString() {
-		String info = String.format("Product [productId:%d,  name: %s, dept: %s, price: %.2f",
+		String info = String.format("productId:%d,name:%s,dept:%s,price:%.2f",
 				id, name, dept, price);
 		return info;
 	}

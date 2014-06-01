@@ -14,12 +14,18 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+
 import productdb.ProductAlreadyExistsException;
 
 /**
@@ -51,7 +57,14 @@ public class ProductDBServer extends ProductDBImpl{
 		String [] tokens = mesg.split(" ");
 		PrintWriter pw = new PrintWriter(socket.getOutputStream());
 		
-		if( tokens.length != 2){
+		String activity = tokens[0].trim();
+		System.out.println("Activity ---> ");
+		System.out.println(activity);
+		
+		ACTIVITIES task = ACTIVITIES.valueOf(activity.toUpperCase());
+				
+	
+		if(( tokens.length != 2) && (!task.name().equals("LIST"))){
 			System.out.println("[ERROR] 1. invalid command: " + mesg);
 			pw.println("[ERROR] invalid command: " + mesg);
 			pw.flush();
@@ -62,22 +75,15 @@ public class ProductDBServer extends ProductDBImpl{
 		String [] productParams = tokens[1].split(",");
 		String results = null;
 		
-		if (productParams.length < 1 ){
+		if ((productParams.length < 1 ) && (!task.name().equals("LIST"))){
 			System.out.println("[ERROR] 2. invalud command: " + productParams);
 			pw.println("[ERROR[ invalid command: " + mesg);
 			pw.flush();
 			socket.close();
 			return;
 		}
-		
-		String activity = tokens[0].trim();
-		
-		System.out.println("Activity ---> ");
-		System.out.println(activity);
-		
-		ACTIVITIES task = ACTIVITIES.valueOf(activity.toUpperCase());
+			
 		Date ts = Calendar.getInstance().getTime();
-		
 		
 		switch(task){
 		
@@ -103,13 +109,20 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		case UPDATE:
 			System.out.println("About to update a product");
-			results = "[OK] About to update a product " + "[" + ts + "]";
-			System.out.println(productParams[0]);
-			System.out.println(productParams[1]);
-			System.out.println(productParams[2]);
-			System.out.println(productParams[3]);
 			
+			Product prodUpdated = new Product(Integer.parseInt(productParams[0]), 
+					                          productParams[1], 
+					                          Double.parseDouble(productParams[2]), 
+					                          DeptCode.valueOf(productParams[3]));
+			try{
+				updateProduct(prodUpdated);
+			}catch (ProductNotFoundException e){
+				e.printStackTrace();
+			}
+			
+			results = "[OK] Product updated " + "[" + ts + "]";
 			break;
+			
 		case DELETE:
 			System.out.println("About to delete a product");
 			
@@ -127,8 +140,18 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		case LIST:
 			System.out.println("About to list all products");
-			results = "[OK] About to add a product " + "[" + ts + "]";
+			results = "[OK] List all products " + "[" + ts + "]";
+			
+			List<Product> productList = new ArrayList<Product>();	
+			productList = getAllProducts(); 
+	
+			for( Product item: productList){
+				System.out.println(item);
+				results = results + item + "\n"; 
+			}
+			
 			break;
+			
 		case SEARCH:
 			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
 			results = "[OK] " + prodInfo;
@@ -188,9 +211,6 @@ public class ProductDBServer extends ProductDBImpl{
 				}
 			}
 		}
-		
-		
-
 	}
 
 }

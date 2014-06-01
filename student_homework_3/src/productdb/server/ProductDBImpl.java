@@ -217,6 +217,7 @@ public class ProductDBImpl implements ProductDB {
 			try{
 				Product tmpProd = (Product)input.readObject();
 				productCatalog.put(tmpProd.getId(), tmpProd);
+				lastProductIdAdded++;
 			}catch (EOFException e){
 				endOfFile = true; 
 			}catch (IOException e){

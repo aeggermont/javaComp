@@ -11,6 +11,7 @@ import productdb.ProductNotFoundException;
 
 /* Additional imports */
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
 import java.net.Socket;
@@ -97,8 +98,54 @@ public class ProductDBClient implements ProductDB {
 
 	@Override
 	public List<Product> getAllProducts() {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<Product> products = new ArrayList<Product>();
+		
+		String mesg = null;   
+		String line = null;
+		String [] tokens;
+		
+		mesg = "LIST " + ",";
+
+		connectToServer();
+		
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(mesg);
+			pw.flush();
+			
+			line = reader.readLine();
+			
+			System.out.println("results: " + line);
+			
+			while(true){
+				line = reader.readLine();
+				if ( line == null) { break; }
+				
+				tokens = line.split(",");
+				
+				// Integer id, String name, double price, DeptCode code
+				
+				if ( tokens.length == 4){
+					System.out.println(tokens[1].split(":")[1]);
+					
+					products.add(new Product(Integer.parseInt(tokens[0].split(":")[1]), 
+											 tokens[1].split(":")[1], 
+							                 Double.parseDouble(tokens[2].split(":")[1]), 
+							                 DeptCode.valueOf(tokens[3].split(":")[1])));
+				}
+			}
+			
+			reader.close();
+			
+		} catch( IOException e){
+			e.printStackTrace();
+		} finally {
+			closeConnection();
+		}
+	
+		return products;
 	}
 
 	@Override
@@ -233,14 +280,24 @@ public class ProductDBClient implements ProductDB {
 		try {
 			productDB.getProduct(5);
 			productDB.addProduct( new Product("ipodX1", 131.0, DeptCode.ELECTRONICS));
+			productDB.getAllProducts();
 			productDB.deleteProduct(1);
-			productDB.updateProduct(updatedProd);
+			//productDB.getAllProducts();
+			//productDB.updateProduct(updatedProd);
 			//productDB.getProduct(productId);
 			//productDB.quitServer(socket);
 		} catch (ProductAlreadyExistsException e){
 			e.printStackTrace();
 		} catch ( ProductNotFoundException e){
 			e.printStackTrace();
+		}
+		
+		
+		for (Product item: productDB.getAllProducts()){
+			System.out.println("-------------------------");
+			System.out.println(item.getName());
+			System.out.println(item.getId());
+			System.out.println(item.getPrice());		
 		}
 		
 		
