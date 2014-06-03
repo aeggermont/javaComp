@@ -31,7 +31,11 @@ public class ProductDBClient implements ProductDB {
 	public static final int PORT_NO = 8900;
 	private static Socket socket_fd;
 	
-	
+	/*
+	 * Connects to the ProductDB server
+	 * @param server name
+	 * @throws IO exception for unsuccessful  connections
+	 */
 	public void connectToServer(){
 		
 		try{
@@ -41,7 +45,10 @@ public class ProductDBClient implements ProductDB {
 		}
 	}
 	
-		
+	/*
+	 * Close current connection with the ProductDB server
+	 * @throws IO exception for unsuccessful  connections
+	 */
 	public void closeConnection(){
 		try{
 			socket_fd.close();
@@ -51,22 +58,16 @@ public class ProductDBClient implements ProductDB {
 		}		
 	}
 	
-	public void stopServer(){
-		
-		try{
-			socket_fd.close();
-		} catch (IOException e){
-			e.printStackTrace();
-		}
-	}
-	
 	
 	@Override
 	public Product getProduct(int productId) {
 		
-		String mesg = null;
-		mesg = "SEARCH " + String.valueOf(productId) + ",";
 		Product prodInfo = null;
+		String mesg = null;
+        String result;
+        
+		mesg = "SEARCH " + String.valueOf(productId) + ",";
+		
 		connectToServer();
 		
 		try{
@@ -74,12 +75,8 @@ public class ProductDBClient implements ProductDB {
 			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
 			pw.println(mesg);
 			pw.flush();
-			
-			String result = reader.readLine();
+			result = reader.readLine();
 			reader.close();
-			System.out.println(result);
-            
-			
 		}catch ( IOException e){
 			e.printStackTrace();
 			return null;
@@ -87,25 +84,71 @@ public class ProductDBClient implements ProductDB {
 			closeConnection();
 		}
 		
+		if (!result.contains("[ERROR] ProductNotFound")) { 
+			
+			 String [] resultLine = result.split(" ");
+			 String [] tokens = resultLine[1].split(",");
+			
+			 prodInfo = new Product ( Integer.parseInt(tokens[0].split(":")[1]),
+					   tokens[1].split(":")[1],
+					   Double.parseDouble(tokens[3].split(":")[1]),
+					   DeptCode.valueOf(tokens[2].split(":")[1]) );
+		}
+		
 		return prodInfo;
 	}
 
 	@Override
 	public List<Product> getProductsByDept(DeptCode code) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<Product> products = new ArrayList<Product>();
+		String mesg = null;   
+		String lineMesg = null;
+		String [] tokens;
+		
+		mesg = "LIST " + "deptCode:" + code.name() + ",";
+		
+		connectToServer();
+		
+		try{
+			BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(mesg);
+			pw.flush();
+			//lineMesg = reader.readLine();
+		
+			while(true){
+				lineMesg = reader.readLine();
+				if ( lineMesg == null) { break; }				
+				tokens = lineMesg.split(",");
+				
+				if ( tokens.length == 4){		
+					products.add(new Product ( Integer.parseInt(tokens[0].split(":")[1]),
+											   tokens[1].split(":")[1],
+											   Double.parseDouble(tokens[3].split(":")[1]),
+											   DeptCode.valueOf(tokens[2].split(":")[1]) ));
+				}
+			}
+			
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally{
+			closeConnection();
+		}
+		
+		return products;
 	}
 
 	@Override
 	public List<Product> getAllProducts() {
 		
 		List<Product> products = new ArrayList<Product>();
-		
+	
 		String mesg = null;   
 		String line = null;
 		String [] tokens;
 		
-		mesg = "LIST " + ",";
+		mesg = "LISTALL " + ",";
 
 		connectToServer();
 		
@@ -114,26 +157,16 @@ public class ProductDBClient implements ProductDB {
 			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
 			pw.println(mesg);
 			pw.flush();
-			
 			line = reader.readLine();
-			
-			System.out.println("results: " + line);
-			
-			// IF not [ERROR] in results
-			
+
 			while(true){
 				line = reader.readLine();
-				if ( line == null) { break; }
 				
+				if ( line == null) { break; }
+	
 				tokens = line.split(",");
 				
-				if ( tokens.length == 4){
-					
-					// System.out.println(tokens[0].split(":")[1]);
-					// System.out.println(tokens[1].split(":")[1]);
-					// System.out.println(tokens[3].split(":")[1]);
-					// System.out.println((DeptCode.valueOf(tokens[2].split(":")[1])));
-					
+				if ( tokens.length == 4){		
 					products.add(new Product ( Integer.parseInt(tokens[0].split(":")[1]),
 											   tokens[1].split(":")[1],
 											   Double.parseDouble(tokens[3].split(":")[1]),
@@ -147,72 +180,71 @@ public class ProductDBClient implements ProductDB {
 			e.printStackTrace();
 		} finally {
 			closeConnection();
-		}
-	
+		}    
 		return products;
 	}
 
+	
 	@Override
 	public void addProduct(Product product)
 			throws ProductAlreadyExistsException {
 		
-		String mesg = null;       
+		String mesg = null;
+		String line = null;
         mesg = "ADD " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
-        System.out.println(mesg);
         connectToServer();
         
         try {
-        	
         	BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
         	PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
         	pw.println(mesg);
         	pw.flush();
-        	
-        	String line = reader.readLine();
+        	line = reader.readLine();
 			reader.close();
-			System.out.println("results: " + line);
-                 
         } catch ( IOException e){
         	e.printStackTrace();
         }finally{
         	closeConnection();
         }
 
+        if (line.contains("[ERROR] product already exists")){
+        	throw new ProductAlreadyExistsException(line);
+        }
+        
 	}
 
 	@Override
 	public void updateProduct(Product product) throws ProductNotFoundException {
 		
 		String mesg = null;
+		String line = null;
 		mesg = "UPDATE " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
-		System.out.println(mesg);
 		connectToServer();
 		
 		try{
 			BufferedReader reader = new BufferedReader( new InputStreamReader(socket_fd.getInputStream()));
 			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
 			pw.println(mesg);
-			pw.flush();
-			
-			String line = reader.readLine();
+			pw.flush();	
+			line = reader.readLine();
 			reader.close();
-			
-			System.out.println("results: " + line);
 		} catch (IOException e){
 			e.printStackTrace();
 		}finally{
 			closeConnection();
 		}
 		
+		if (line.contains("[ERROR] ProductNotFound")) { 
+			throw new ProductNotFoundException(line); 
+		}
 	}
 
 	@Override
 	public void deleteProduct(int productId) throws ProductNotFoundException {
 		
 		String mesg = null;
+		String lineMesg = null;
 		mesg = "DELETE " + String.valueOf(productId);
-		
-		System.out.println(mesg);
 		connectToServer();
 		
 		try{
@@ -220,15 +252,19 @@ public class ProductDBClient implements ProductDB {
 			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
         	pw.println(mesg);
         	pw.flush();
-        	
-        	String line = reader.readLine();
+        	lineMesg = reader.readLine();
         	reader.close();
-        	System.out.println("results: " + line);
-        	
+        	System.out.println("results: " + lineMesg);     	
 		}catch(IOException e){
 			e.printStackTrace();
 		}finally{
 			closeConnection();
+		}
+		
+		if (lineMesg.contains("[ERROR] product not found")) { 
+			throw new ProductNotFoundException(lineMesg); 
+		}else{
+			System.out.println(lineMesg);
 		}
 	}
 
@@ -279,25 +315,38 @@ public class ProductDBClient implements ProductDB {
 		
 		
 		try {
+			System.out.println(productDB.getProduct(5));
 			productDB.updateProduct(updatedProd);
-			productDB.getProduct(5);
-			productDB.addProduct( new Product("ipodX1", 131.0, DeptCode.ELECTRONICS));
-			productDB.deleteProduct(1);
-			productDB.getAllProducts();
-			
+			productDB.addProduct( new Product("ipodM4", 131.0, DeptCode.ELECTRONICS));
+			productDB.deleteProduct(4);
 			//productDB.quitServer(socket);
 		} catch (ProductAlreadyExistsException e){
-		//	e.printStackTrace();
+			e.printStackTrace();
 		} catch ( ProductNotFoundException e){
 			e.printStackTrace();
 		}
-			
+		
+		
+		System.out.println("Printing products by department");
+		
+		for (Product item: productDB.getProductsByDept(DeptCode.ELECTRONICS)){
+			System.out.println("-------------------------");
+			System.out.println(item.getName());
+			System.out.println(item.getDept().name());
+			System.out.println(item.getId());
+			System.out.println(item.getPrice());	
+		}
+		
+		System.out.println("Printing all products");
+		
 		for (Product item: productDB.getAllProducts()){
 			System.out.println("-------------------------");
 			System.out.println(item.getName());
+			System.out.println(item.getDept().name());
 			System.out.println(item.getId());
-			System.out.println(item.getPrice());		
-		}		
+			System.out.println(item.getPrice());	
+		}
+				
 	}
 
 }

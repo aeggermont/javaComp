@@ -37,7 +37,7 @@ import productdb.ProductAlreadyExistsException;
 public class ProductDBServer extends ProductDBImpl{
 	
 	public static final int PORT_NO = 8900;
-	public enum ACTIVITIES { ADD, UPDATE, DELETE, LIST, SEARCH };
+	public enum ACTIVITIES { ADD, UPDATE, DELETE, LIST, SEARCH, LISTALL };
 	
 	public ProductDBServer(){
 		super();
@@ -75,7 +75,7 @@ public class ProductDBServer extends ProductDBImpl{
 		String [] productParams = tokens[1].split(",");
 		String results = null;
 		
-		if ((productParams.length < 1 ) && (!task.name().equals("LIST"))){
+		if (  (productParams.length < 1 ) && (!task.name().equals("LIST")) &&  (!task.name().equals("LISTALL"))){
 			System.out.println("[ERROR] 2. invalud command: " + productParams);
 			pw.println("[ERROR[ invalid command: " + mesg);
 			pw.flush();
@@ -97,29 +97,19 @@ public class ProductDBServer extends ProductDBImpl{
 			
 			try {
 				addProduct(prod);
+				results = "[OK] added product " + prod + " [" + ts + "]";
 			} catch (ProductAlreadyExistsException e){
 				results = "[ERROR] product already exists " + prod + " [" + ts + "]";
 				System.out.println(results);
-				break;
+			}finally{
+				System.out.println(results);
+				pw.println(results);
+				pw.flush();
 			}
-			
-			results = "[OK] added product " + prod + " [" + ts + "]";
-			System.out.println(results);
-			pw.println(results);
-			pw.flush();
-			
+		
 			break;
 			
 		case UPDATE:
-			System.out.println("About to update a product");
-			
-			System.out.println(productParams[0]);
-			System.out.println(productParams[1]);
-			System.out.println(productParams[2]);
-			
-		    System.out.println(productParams[0]); 
-		    System.out.println(Double.parseDouble(productParams[2]));
-		    System.out.println(DeptCode.valueOf(productParams[1]));
 		    				
 			Product prodUpdated = new Product(productParams[0], 
 					                          Double.parseDouble(productParams[2]), 
@@ -131,10 +121,10 @@ public class ProductDBServer extends ProductDBImpl{
 			}catch (ProductNotFoundException e){
 				results = "[ERROR] ProductNotFound " + "[" + ts + "]";
 				e.printStackTrace();
+			}finally{
+				pw.println(results);
+				pw.flush();
 			}
-			
-			pw.println(results);
-			pw.flush();
 			
 			break;
 			
@@ -143,43 +133,51 @@ public class ProductDBServer extends ProductDBImpl{
 			
 			try{
 				deleteProduct(Integer.parseInt(productParams[0]));
-				
+				results = "[OK] Product deleted " + "[" + ts + "]";
 			} catch(ProductNotFoundException e) {
 				e.printStackTrace();
-				results = "[ERROR] product does not exist ";
+				results = "[ERROR] product not found ";
 				break;
+			}finally{
+				pw.println(results);
+				pw.flush();
 			}
 			
-			results = "[OK] Deleted " + "[" + ts + "]";
-			pw.println(results);
-			pw.flush();
 			break;
 			
 		case LIST:
-			System.out.println("About to list all products");
-			results = "[OK] List all products " + "[" + ts + "]";
+			System.out.println("About to list products by product code");
+			results = "[OK] About to print products by code" + " [" + ts + "]";
+			System.out.println(productParams[0].split(":")[1]);
 			
-			List<Product> productList = new ArrayList<Product>();	
-			productList = getAllProducts(); 
-	
-			pw.println(results);
-			pw.flush();
-			
-			for( Product item: productList){
+			for ( Product item : getProductsByDept( DeptCode.valueOf(productParams[0].split(":")[1]))){
 				System.out.println(item);
 				pw.println(item);
 				pw.flush();
-				results = item + "\n";
 			}
+						
+			break;
+			
+		case LISTALL:
+			System.out.println("About to list all products");
+			results = "[OK] List all products " + "[" + ts + "]";
+			pw.println(results);
+			pw.flush();
+			
+			for( Product item: getAllProducts()){
+				pw.println(item);
+				pw.flush();
+			}
+			
 			break;
 			
 		case SEARCH:
 			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
 			results = "[OK] " + prodInfo;
 			pw.println(results);
-			pw.flush();
-			
+			pw.flush();	
 			break;
+			
 		default:
 			pw.println("[ERROR[ invalid command: " + mesg);
 			results = "[ERROR[ invalid command: " + mesg + "[" + ts + "]";
@@ -201,7 +199,7 @@ public class ProductDBServer extends ProductDBImpl{
 		ProductDBServer productDB =  new ProductDBServer();
 		System.out.println(" ****** Loading Data to Database ******");
 
-		
+		/*
 		try{
 			productDB.loadProductsFromDisk();
 			
@@ -210,6 +208,7 @@ public class ProductDBServer extends ProductDBImpl{
 		}
 		
 		System.out.println("****** Initializing Server ****** ");
+		*/
 		
 		ServerSocket serverSocket = new ServerSocket(productDB.PORT_NO);
 		
