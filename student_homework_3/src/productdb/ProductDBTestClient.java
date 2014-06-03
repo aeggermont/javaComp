@@ -10,8 +10,8 @@ import productdb.util.Assert;
 /**
  * This class exercises all the methods in the @link{ProductDB} interface
  *  
- * @author hluu
- *
+ * @author aeggermont
+ * @date   03/06/2014
  */
 public class ProductDBTestClient {
 
@@ -66,10 +66,10 @@ public class ProductDBTestClient {
 		
 		double newPrice = ipod.getPrice() + Math.random() * 100;
 		ipod.setPrice(newPrice);
+		System.out.println(ipod);
 		productDB.updateProduct(ipod);
 		
-		// TODO Assert.assertEquals(newPrice, productDB.getProduct(ipod.getId()).getPrice());
-		
+		Assert.assertEquals(newPrice, productDB.getProduct(ipod.getId()).getPrice());
 	
 		// testing getAllProducts()
 		List<Product> productList = productDB.getAllProducts();

@@ -77,6 +77,8 @@ public class ProductDBClient implements ProductDB {
 			pw.flush();
 			result = reader.readLine();
 			reader.close();
+			System.out.println("Client got ...");
+			System.out.println(result);
 		}catch ( IOException e){
 			e.printStackTrace();
 			return null;
@@ -84,8 +86,8 @@ public class ProductDBClient implements ProductDB {
 			closeConnection();
 		}
 		
-		if (!result.contains("[ERROR] ProductNotFound")) { 
-			
+		if (!result.contains("[ERROR]")) { 
+		
 			 String [] resultLine = result.split(" ");
 			 String [] tokens = resultLine[1].split(",");
 			
@@ -93,6 +95,8 @@ public class ProductDBClient implements ProductDB {
 					   tokens[1].split(":")[1],
 					   Double.parseDouble(tokens[3].split(":")[1]),
 					   DeptCode.valueOf(tokens[2].split(":")[1]) );
+		}else{
+			System.out.println(result);
 		}
 		
 		return prodInfo;
@@ -207,7 +211,7 @@ public class ProductDBClient implements ProductDB {
         	closeConnection();
         }
 
-        if (line.contains("[ERROR] product already exists")){
+        if (line.contains("[ERROR]")){
         	throw new ProductAlreadyExistsException(line);
         }
         
@@ -234,7 +238,7 @@ public class ProductDBClient implements ProductDB {
 			closeConnection();
 		}
 		
-		if (line.contains("[ERROR] ProductNotFound")) { 
+		if (line.contains("[ERROR]")) { 
 			throw new ProductNotFoundException(line); 
 		}
 	}
@@ -261,7 +265,7 @@ public class ProductDBClient implements ProductDB {
 			closeConnection();
 		}
 		
-		if (lineMesg.contains("[ERROR] product not found")) { 
+		if (lineMesg.contains("[ERROR]")) { 
 			throw new ProductNotFoundException(lineMesg); 
 		}else{
 			System.out.println(lineMesg);

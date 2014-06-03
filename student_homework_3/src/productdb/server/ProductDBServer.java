@@ -37,7 +37,7 @@ import productdb.ProductAlreadyExistsException;
 public class ProductDBServer extends ProductDBImpl{
 	
 	public static final int PORT_NO = 8900;
-	public enum ACTIVITIES { ADD, UPDATE, DELETE, LIST, SEARCH, LISTALL };
+	public enum ACTIVITIES { ADD, UPDATE, DELETE, LIST, SEARCH, LISTALL, LOAD, SAVE, QUIT};
 	
 	public ProductDBServer(){
 		super();
@@ -110,7 +110,8 @@ public class ProductDBServer extends ProductDBImpl{
 			break;
 			
 		case UPDATE:
-		    				
+		    System.out.println("About to update product ... ");
+		    
 			Product prodUpdated = new Product(productParams[0], 
 					                          Double.parseDouble(productParams[2]), 
 					                          DeptCode.valueOf(productParams[1]));
@@ -119,8 +120,7 @@ public class ProductDBServer extends ProductDBImpl{
 				updateProduct(prodUpdated);
 				results = "[OK] Product updated " + "[" + ts + "]";
 			}catch (ProductNotFoundException e){
-				results = "[ERROR] ProductNotFound " + "[" + ts + "]";
-				e.printStackTrace();
+				results = "[ERROR] " + e.getMessage() + "[" + ts + "]";
 			}finally{
 				pw.println(results);
 				pw.flush();
@@ -135,8 +135,7 @@ public class ProductDBServer extends ProductDBImpl{
 				deleteProduct(Integer.parseInt(productParams[0]));
 				results = "[OK] Product deleted " + "[" + ts + "]";
 			} catch(ProductNotFoundException e) {
-				e.printStackTrace();
-				results = "[ERROR] product not found ";
+				results = "[ERROR] " + e.getMessage() + "[" + ts + "]";
 				break;
 			}finally{
 				pw.println(results);
@@ -174,8 +173,16 @@ public class ProductDBServer extends ProductDBImpl{
 		case SEARCH:
 			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
 			results = "[OK] " + prodInfo;
+			System.out.println(results);
 			pw.println(results);
 			pw.flush();	
+			break;
+			
+		case LOAD:
+			break;
+		case SAVE:
+			break;
+		case QUIT:
 			break;
 			
 		default:
