@@ -49,30 +49,18 @@ public class ProductDBServer extends ProductDBImpl{
 		String [] productParams;
 		String results = null;
 		Date ts = Calendar.getInstance().getTime();
-		String [] tokens = mesg.split(" ");
+		String [] tokens = mesg.split(";");
 		
 		System.out.println("got request: " + mesg);
 		
 		PrintWriter pw = new PrintWriter(socket.getOutputStream());
 		
-		String activity = tokens[0].trim();
-		System.out.println("Activity ---> ");
-		System.out.println(activity);
-		
+		String activity = tokens[0].trim();		
 		ACTIVITIES task = ACTIVITIES.valueOf(activity.toUpperCase());
-				
-		if(( tokens.length != 2) && (!task.name().equals("LIST"))){
-			System.out.println("[ERROR] 1. invalid command: " + mesg);
-			pw.println("[ERROR] invalid command: " + mesg);
-			pw.flush();
-			socket.close();
-			return;
-		}
-		
+						
 		productParams = tokens[1].split(",");
-		
-		// Verifies complete messages for ADD, DELETE and UPDATE operations
-		if (  (productParams.length < 2 ) && (!task.name().equals("LIST")) && 
+
+		if (  (productParams.length < 1 ) && (!task.name().equals("LIST")) && 
 			  (!task.name().equals("LISTALL")) &&  (!task.name().equals("SAVE"))  &&      
 			  (!task.name().equals("QUIT")) && (!task.name().equals("LOAD")) ){
 			
@@ -82,7 +70,7 @@ public class ProductDBServer extends ProductDBImpl{
 			socket.close();
 			return;
 		}
-			
+		
 		
 		switch(task){
 		
@@ -90,9 +78,6 @@ public class ProductDBServer extends ProductDBImpl{
 			System.out.println("About to add a product ");
 			
 			Product prod = new Product(productParams[0], Double.parseDouble(productParams[2]), DeptCode.valueOf(productParams[1]));
-			
-			System.out.println("===== Serialized object ======= ");
-			System.out.println(prod);
 			
 			try {
 				addProduct(prod);
@@ -127,8 +112,6 @@ public class ProductDBServer extends ProductDBImpl{
 			break;
 			
 		case DELETE:
-			System.out.println("About to delete a product");
-			
 			try{
 				deleteProduct(Integer.parseInt(productParams[0]));
 				results = "[OK] Product deleted " + "[" + ts + "]";
@@ -143,9 +126,8 @@ public class ProductDBServer extends ProductDBImpl{
 			break;
 			
 		case LIST:
-			System.out.println("About to list products by product code");
 			results = "[OK] About to print products by code" + " [" + ts + "]";
-			System.out.println(productParams[0].split(":")[1]);
+			//System.out.println(productParams[0].split(":")[1]);
 			
 			for ( Product item : getProductsByDept( DeptCode.valueOf(productParams[0].split(":")[1]))){
 				System.out.println(item);
@@ -156,7 +138,7 @@ public class ProductDBServer extends ProductDBImpl{
 			break;
 			
 		case LISTALL:
-			System.out.println("About to list all products");
+	
 			results = "[OK] List all products " + "[" + ts + "]";
 			pw.println(results);
 			pw.flush();
@@ -220,7 +202,6 @@ public class ProductDBServer extends ProductDBImpl{
 			return;
 		}
 		
-		System.out.println("sent back result: " + results );
 		socket.close();
 	    return;
 	}
@@ -233,11 +214,6 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		ProductDBServer productDB =  new ProductDBServer();
 		System.out.println(" ****** Loading Data to Database ******");
-
-		/*
-		
-		System.out.println("****** Initializing Server ****** ");
-		*/
 		
 		ServerSocket serverSocket = new ServerSocket(productDB.PORT_NO);
 		
@@ -261,5 +237,4 @@ public class ProductDBServer extends ProductDBImpl{
 			}
 		}
 	}
-
 }

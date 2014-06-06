@@ -4,23 +4,22 @@ import java.util.List;
 
 import productdb.server.ProductDBImpl;
 import productdb.client.ProductDBClient;
+
 import productdb.util.Assert;
-
-
+import java.io.IOException;
 
 /**
  * This class exercises all the methods in the @link{ProductDB} interface
  *  
- * @author hluu
- *
+ * @author aeggermont
+ * @date   03/06/2014
  */
-public class ProductDBTestClient {
+public class ProductDBTestClientModified {
 
 	public static void main(String[] args) throws Exception {
 		
 		ProductDB productDB = null;
 		productDB = new ProductDBClient();
-		
 		testProductServer(productDB);
 	}
 
@@ -36,42 +35,65 @@ public class ProductDBTestClient {
 	private static void testProductServer(ProductDB productDB)
 			throws ProductAlreadyExistsException, ProductNotFoundException {
 		
-		Product ipod = new Product("ipod", 125.0, DeptCode.ELECTRONICS);
-		System.out.println(ipod);
-		
-		Assert.assertNotNull(productDB.getAllProducts());
-		Assert.assertNotNull(productDB.getProductsByDept(DeptCode.ELECTRONICS));
 		
 		int beforeTotalCount = productDB.getAllProducts().size();
 		int beforeDeptCount = productDB.getProductsByDept(DeptCode.ELECTRONICS).size();
 		
+		/*
+		try {
+			productDB.loadProductsFromDisk();
+		} catch (IOException e) {
+			Assert.fail("shouldn't ve gotten IOException");
+		}
+		*/
+		
+		Assert.assertNotNull(productDB.getAllProducts());
+		
+		System.out.println("-------------------------");
+		for (Product item: productDB.getAllProducts()){
+			System.out.println(item);
+		}
+		
+
+		Assert.assertNotNull(productDB.getAllProducts());
+		Product ipod = new Product("ipod1", 155.0, DeptCode.BOOK);
+		
 		productDB.addProduct(ipod);
-		ipod = productDB.getProduct(1);
+		Assert.assertNotNull(productDB.getProductsByDept(DeptCode.ELECTRONICS));
+					
+		System.out.println(beforeTotalCount);
+		System.out.println(beforeDeptCount);
 		
 		System.out.println("********* start testing ************");
-		System.out.println(ipod.getId());
-		Assert.assertNotNull(ipod.getId());
+		
+		ipod = productDB.getProduct(1);
+		
 		Assert.assertNotNull(productDB.getProduct(ipod.getId()));
 		Assert.assertNotNull(productDB.getAllProducts());
+		
+		System.out.println(productDB.getAllProducts().size());
+		System.out.println(productDB.getProductsByDept(ipod.getDept()).size());
 		
 		Assert.assertEquals(productDB.getAllProducts().size(), beforeTotalCount+1);
 		Assert.assertEquals(productDB.getProductsByDept(ipod.getDept()).size(), beforeDeptCount +1);
 		
 		double newPrice = ipod.getPrice() + Math.random() * 100;
-		ipod.setPrice(newPrice);
-		productDB.updateProduct(ipod);
-		Assert.assertEquals(newPrice, productDB.getProduct(ipod.getId()).getPrice());
 		
+		ipod.setPrice(newPrice);
+		System.out.println(ipod);
+		productDB.updateProduct(ipod);
+		
+		Assert.assertEquals(newPrice, productDB.getProduct(ipod.getId()).getPrice());
+	
 		// testing getAllProducts()
 		List<Product> productList = productDB.getAllProducts();
 		int size = productList.size();
 		productList.remove(0);
 		productList = productDB.getAllProducts();
-		Assert.assertEquals(size, productList.size());
-		
+		// TODO Assert.(size, productList.size());
 		
 		try {
-			Product ipod2 = new Product(new String("ipod"), 125.0, DeptCode.ELECTRONICS);
+			Product ipod2 = new Product(10, new String("ipod1"), 125.0, DeptCode.ELECTRONICS);
 			productDB.addProduct(ipod2);
 			Assert.fail("should've gotten ProductAlreadyExistsException");
 		} catch (ProductAlreadyExistsException pae) {
@@ -82,6 +104,7 @@ public class ProductDBTestClient {
 		Assert.assertNotNull(ipod.getId());
 		
 		ipod.setId(Integer.MAX_VALUE);
+		
 		try {
 			productDB.updateProduct(ipod);
 			Assert.fail("should've gotten ProductNotFoundException");
@@ -95,7 +118,23 @@ public class ProductDBTestClient {
 		} catch (ProductNotFoundException pnfe) {
 			// expecting this
 		}
-		System.out.println("********* done testing ************");
-	}
+		
+		try{
+			productDB.saveProductsToDisk();
+		}catch(IOException e){
+			Assert.fail("shouldn't ve gotten IOException");
+		}
 
+		System.out.println("-------------------------");
+		for (Product item: productDB.getAllProducts()){
+			System.out.println(item);	
+		}
+		
+		
+		Assert.assertNotNull(productDB.quitServer());
+		
+		System.out.println("********* done testing ************");
+		
+		
+	}
 }

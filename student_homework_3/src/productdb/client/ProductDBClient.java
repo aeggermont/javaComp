@@ -23,7 +23,7 @@ import java.io.PrintWriter;
 /**
  * Client side of homework #5
  * 
- * @author hluu
+ * @author aeggermont
  *
  */
 public class ProductDBClient implements ProductDB {
@@ -33,7 +33,6 @@ public class ProductDBClient implements ProductDB {
 	
 	/*
 	 * Connects to the ProductDB server
-	 * @param server name
 	 * @throws IO exception for unsuccessful  connections
 	 */
 	public void connectToServer(){
@@ -47,7 +46,6 @@ public class ProductDBClient implements ProductDB {
 	
 	/*
 	 * Close current connection with the ProductDB server
-	 * @throws IO exception for unsuccessful  connections
 	 */
 	public void closeConnection(){
 		try{
@@ -66,7 +64,7 @@ public class ProductDBClient implements ProductDB {
 		String mesg = null;
         String result;
         
-		mesg = "SEARCH " + String.valueOf(productId) + ",";
+		mesg = "SEARCH;" + String.valueOf(productId) + ",";
 		
 		connectToServer();
 		
@@ -77,8 +75,6 @@ public class ProductDBClient implements ProductDB {
 			pw.flush();
 			result = reader.readLine();
 			reader.close();
-			System.out.println("Client got ...");
-			System.out.println(result);
 		}catch ( IOException e){
 			e.printStackTrace();
 			return null;
@@ -110,7 +106,7 @@ public class ProductDBClient implements ProductDB {
 		String lineMesg = null;
 		String [] tokens;
 		
-		mesg = "LIST " + "deptCode:" + code.name() + ",";
+		mesg = "LIST;" + "deptCode:" + code.name() + ",";
 		
 		connectToServer();
 		
@@ -119,8 +115,7 @@ public class ProductDBClient implements ProductDB {
 			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
 			pw.println(mesg);
 			pw.flush();
-			//lineMesg = reader.readLine();
-		
+			
 			while(true){
 				lineMesg = reader.readLine();
 				if ( lineMesg == null) { break; }				
@@ -152,7 +147,7 @@ public class ProductDBClient implements ProductDB {
 		String line = null;
 		String [] tokens;
 		
-		mesg = "LISTALL " + ",";
+		mesg = "LISTALL;" + ",";
 
 		connectToServer();
 		
@@ -195,7 +190,7 @@ public class ProductDBClient implements ProductDB {
 		
 		String mesg = null;
 		String line = null;
-        mesg = "ADD " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
+        mesg = "ADD;" + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
         connectToServer();
         
         try {
@@ -222,7 +217,7 @@ public class ProductDBClient implements ProductDB {
 		
 		String mesg = null;
 		String line = null;
-		mesg = "UPDATE " + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
+		mesg = "UPDATE;" + product.getName() + "," + product.getDept().name() + "," + product.getPrice();
 		connectToServer();
 		
 		try{
@@ -248,7 +243,7 @@ public class ProductDBClient implements ProductDB {
 		
 		String mesg = null;
 		String lineMesg = null;
-		mesg = "DELETE " + String.valueOf(productId);
+		mesg = "DELETE;" + String.valueOf(productId);
 		connectToServer();
 		
 		try{
@@ -273,15 +268,37 @@ public class ProductDBClient implements ProductDB {
 	}
 
     @Override
-    public void saveProductsToDisk(){
-    	// TODO Auto-generated method stub
+    public void saveProductsToDisk() throws IOException{
+    	
+    	String msgLine = null;
+    	String msg = "SAVE;,";
+    	
+    	connectToServer();
+    	
+    	try{
+    		BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(msg);
+			pw.flush();
+			msgLine = reader.readLine();
+			System.out.println(msgLine);	
+    	}catch(IOException e){
+    		e.printStackTrace();
+    	}finally{
+    		closeConnection();
+    	}
+    	
+    	if (msgLine.contains("[ERROR]")){
+        	throw new IOException();
+        }    	
+    	
     }
 	
     @Override
     public void loadProductsFromDisk() throws IOException{
     	
     	String msgLine = null;
-    	String msg= "LOAD " + ",";
+    	String msg= "LOAD;,";
     	Date d = Calendar.getInstance().getTime();
     	
     	connectToServer();
@@ -292,6 +309,7 @@ public class ProductDBClient implements ProductDB {
 			pw.println(msg);
 			pw.flush();
 			msgLine = reader.readLine();
+			System.out.println(msgLine);
 
     	}catch( IOException e){
     		e.printStackTrace();
@@ -307,12 +325,13 @@ public class ProductDBClient implements ProductDB {
     
     /*
      * Stop remote product server
-     * @throws 
+     * @returns acknowledgment from server upon successful server shutdown or
+     *          error otherwise 
      */
     @Override
     public String quitServer(){
     	
-    	String msg= "QUIT " + ",";
+    	String msg= "QUIT;" + ",";
     	Date d = Calendar.getInstance().getTime();
     	
     	connectToServer();
@@ -336,6 +355,7 @@ public class ProductDBClient implements ProductDB {
     }
 	
 	/**
+	 * Main method with some testing operations 
 	 * @param args
 	 */
 	public static void main(String[] args) {
