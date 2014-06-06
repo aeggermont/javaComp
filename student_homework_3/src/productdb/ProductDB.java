@@ -61,7 +61,7 @@ public interface ProductDB {
      * An implementation of this class decides which File I/O 
      * technique to use and the location of the file.
      */
-    public void saveProductsToDisk();
+    public void saveProductsToDisk() throws IOException;
 	
     /**
      * Load the products from a file.  An implementation of this
@@ -70,6 +70,10 @@ public interface ProductDB {
      */
     public void loadProductsFromDisk() throws IOException;
  
-    
-    public void quitServer(Socket socket) throws IOException;
+    /**
+     * Sends a message to the server to stop it and client endd
+     * connection with it
+     * @throws IOException
+     */
+    public String quitServer();
 }

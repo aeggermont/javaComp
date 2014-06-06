@@ -182,7 +182,7 @@ public class ProductDBImpl implements ProductDB {
      * @throws 
      */
 	@Override
-    public void saveProductsToDisk() {
+    public void saveProductsToDisk() throws IOException {
 		
 		String fileOut = buildPathFileName();
                   
@@ -233,11 +233,16 @@ public class ProductDBImpl implements ProductDB {
     
 	
 	@Override
-	public void quitServer(Socket socket) throws IOException{
+	public String quitServer(){
 		
 		System.out.println("... stopping server ... ");
 		
-		
+		try{
+			saveProductsToDisk();
+			return "[OK] Shutting down product DB server ";
+		}catch(IOException e){
+			return e.getMessage();
+		}
 	}
 	
 	/**

@@ -35,8 +35,12 @@ public class ProductDBTestClient {
 			throws ProductAlreadyExistsException, ProductNotFoundException {
 		
 		Product ipod = new Product("ipod1", 125.0, DeptCode.ELECTRONICS);
-				
 		Assert.assertNotNull(productDB.getAllProducts());
+		Assert.assertNotNull(productDB.quitServer());
+		
+		System.exit(0);
+		
+	
 		Assert.assertNotNull(productDB.getProductsByDept(DeptCode.ELECTRONICS));
 				
 		int beforeTotalCount = productDB.getAllProducts().size();
@@ -53,18 +57,19 @@ public class ProductDBTestClient {
 		Assert.assertNull(ipod.getId());
 		
 		ipod.setId(1);
-		
+		System.out.println(ipod.getId());
+				
 		Assert.assertNotNull(productDB.getProduct(ipod.getId()));
 		Assert.assertNotNull(productDB.getAllProducts());
 		
 		System.out.println(productDB.getAllProducts().size());
 		System.out.println(productDB.getProductsByDept(ipod.getDept()).size());
 		
-		
 		Assert.assertEquals(productDB.getAllProducts().size(), beforeTotalCount+1);
 		Assert.assertEquals(productDB.getProductsByDept(ipod.getDept()).size(), beforeDeptCount +1);
 		
 		double newPrice = ipod.getPrice() + Math.random() * 100;
+		
 		ipod.setPrice(newPrice);
 		System.out.println(ipod);
 		productDB.updateProduct(ipod);
@@ -78,7 +83,6 @@ public class ProductDBTestClient {
 		productList = productDB.getAllProducts();
 		// TODO Assert.(size, productList.size());
 		
-		
 		try {
 			Product ipod2 = new Product(10, new String("ipod1"), 125.0, DeptCode.ELECTRONICS);
 			productDB.addProduct(ipod2);
@@ -86,7 +90,6 @@ public class ProductDBTestClient {
 		} catch (ProductAlreadyExistsException pae) {
 			// expecting this
 		}
-		
 		
 		productDB.deleteProduct(ipod.getId());
 		Assert.assertNotNull(ipod.getId());
@@ -109,5 +112,4 @@ public class ProductDBTestClient {
 		System.out.println("********* done testing ************");
 		System.exit(0);
 	}
-
 }

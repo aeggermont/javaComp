@@ -278,8 +278,31 @@ public class ProductDBClient implements ProductDB {
     }
 	
     @Override
-    public void loadProductsFromDisk(){
-    	//TODO Auto-generated method stub
+    public void loadProductsFromDisk() throws IOException{
+    	
+    	String msgLine = null;
+    	String msg= "LOAD " + ",";
+    	Date d = Calendar.getInstance().getTime();
+    	
+    	connectToServer();
+    	
+    	try{
+    		BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+			PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+			pw.println(msg);
+			pw.flush();
+			msgLine = reader.readLine();
+
+    	}catch( IOException e){
+    		e.printStackTrace();
+    	}finally{
+    		closeConnection();
+    	}
+    	
+        if (msgLine.contains("[ERROR]")){
+        	throw new IOException();
+        }
+    	
     }
     
     /*
@@ -287,24 +310,29 @@ public class ProductDBClient implements ProductDB {
      * @throws 
      */
     @Override
-    public void quitServer(Socket socket) throws IOException{
+    public String quitServer(){
     	
-    	String msg;
-    	
+    	String msg= "QUIT " + ",";
     	Date d = Calendar.getInstance().getTime();
-    	msg = "QUIT [" + d + "]";
     	
-    	BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    	PrintWriter pw = new PrintWriter(socket.getOutputStream());
-    	pw.println(msg);
-    	pw.flush();
+    	connectToServer();
     	
-    	// String line = reader.readLine();
-    	// reader.close();
-    	// System.out.println("result: " + line);
+    	try{
+    		BufferedReader reader = new BufferedReader(new InputStreamReader(socket_fd.getInputStream()));
+    		PrintWriter pw = new PrintWriter(socket_fd.getOutputStream());
+    		pw.println(msg);
+    		pw.flush();
+    		msg = reader.readLine();
+    		System.out.println(msg);  
+        	reader.close();
+    		socket_fd.close();	
+    	} catch(IOException e){
+    		return e.getMessage();
+    	}finally{
+        	closeConnection();
+    	}    
     	
-    	System.out.println("Closing session ...");
-    	socket.close();
+    	return msg;
     }
 	
 	/**

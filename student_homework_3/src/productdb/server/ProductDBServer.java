@@ -46,15 +46,13 @@ public class ProductDBServer extends ProductDBImpl{
 	
 	public void processRequest(Socket socket, String mesg) throws IOException {
 	
+		String [] productParams;
+		String results = null;
+		Date ts = Calendar.getInstance().getTime();
+		String [] tokens = mesg.split(" ");
+		
 		System.out.println("got request: " + mesg);
 		
-		if (mesg.trim().startsWith("QUIT")){
-			System.out.println(" ... server is shutting down");
-			socket.close();
-			System.exit(0);
-		}
-		
-		String [] tokens = mesg.split(" ");
 		PrintWriter pw = new PrintWriter(socket.getOutputStream());
 		
 		String activity = tokens[0].trim();
@@ -63,7 +61,6 @@ public class ProductDBServer extends ProductDBImpl{
 		
 		ACTIVITIES task = ACTIVITIES.valueOf(activity.toUpperCase());
 				
-	
 		if(( tokens.length != 2) && (!task.name().equals("LIST"))){
 			System.out.println("[ERROR] 1. invalid command: " + mesg);
 			pw.println("[ERROR] invalid command: " + mesg);
@@ -72,10 +69,13 @@ public class ProductDBServer extends ProductDBImpl{
 			return;
 		}
 		
-		String [] productParams = tokens[1].split(",");
-		String results = null;
+		productParams = tokens[1].split(",");
 		
-		if (  (productParams.length < 1 ) && (!task.name().equals("LIST")) &&  (!task.name().equals("LISTALL"))){
+		// Verifies complete messages for ADD, DELETE and UPDATE operations
+		if (  (productParams.length < 2 ) && (!task.name().equals("LIST")) && 
+			  (!task.name().equals("LISTALL")) &&  (!task.name().equals("SAVE"))  &&      
+			  (!task.name().equals("QUIT")) && (!task.name().equals("LOAD")) ){
+			
 			System.out.println("[ERROR] 2. invalud command: " + productParams);
 			pw.println("[ERROR[ invalid command: " + mesg);
 			pw.flush();
@@ -83,7 +83,6 @@ public class ProductDBServer extends ProductDBImpl{
 			return;
 		}
 			
-		Date ts = Calendar.getInstance().getTime();
 		
 		switch(task){
 		
@@ -110,7 +109,6 @@ public class ProductDBServer extends ProductDBImpl{
 			break;
 			
 		case UPDATE:
-		    System.out.println("About to update product ... ");
 		    
 			Product prodUpdated = new Product(productParams[0], 
 					                          Double.parseDouble(productParams[2]), 
@@ -172,19 +170,49 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		case SEARCH:
 			Product prodInfo = getProduct(Integer.parseInt(productParams[0]));
-			results = "[OK] " + prodInfo;
-			System.out.println(results);
+			results = "[OK] " + "productId:" + prodInfo.getId() + "," + 
+			          "name:" + prodInfo.getName() + "," + 
+			          "dept:" + prodInfo.getDept().name() + "," + 
+					  "price:" + prodInfo.getPrice();
+			
 			pw.println(results);
 			pw.flush();	
 			break;
 			
 		case LOAD:
-			break;
-		case SAVE:
-			break;
-		case QUIT:
+			try{
+			    loadProductsFromDisk();
+			    results = "[OK] DB loaded from disk " + "[" + ts + "]";    
+			}catch( IOException e){
+				results = "[ERROR] " + e.getMessage() + "[" + ts + "]";
+			}finally{
+				pw.println(results);
+			    pw.flush();
+			}
+			
 			break;
 			
+		case SAVE:
+			try{
+				saveProductsToDisk();
+				results = "[OK] Saved product DB to disk [ "+ ts + "]";
+			}catch(IOException e){
+				results = "[ERROR] " + e.getMessage() + "[" + ts + "]";
+			}finally{
+				pw.println(results);
+				pw.flush();
+			}
+			
+			break;
+			
+		case QUIT:
+			results = quitServer() + "[" + ts + "]";
+			pw.println(results);
+			pw.flush(); 
+			socket.close();
+			System.exit(0);
+			break;
+
 		default:
 			pw.println("[ERROR[ invalid command: " + mesg);
 			results = "[ERROR[ invalid command: " + mesg + "[" + ts + "]";
@@ -207,12 +235,6 @@ public class ProductDBServer extends ProductDBImpl{
 		System.out.println(" ****** Loading Data to Database ******");
 
 		/*
-		try{
-			productDB.loadProductsFromDisk();
-			
-		}catch( IOException e){
-			e.printStackTrace();
-		}
 		
 		System.out.println("****** Initializing Server ****** ");
 		*/
