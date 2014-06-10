@@ -9,10 +9,13 @@ import productdb.util.Assert;
 import java.io.IOException;
 
 /**
- * This class exercises all the methods in the @link{ProductDB} interface
+ * This class exercises all the methods in the @link{ProductDB} interface and additional
+ * tests added for to test more specific features such as shutting down the remote server,
+ * loading data from disk and saving data to disk. 
  *  
  * @author aeggermont
- * @date   03/06/2014
+ * @version 1.0
+ * @date   10/06/2014
  */
 public class ProductDBTestClientModified {
 
@@ -60,20 +63,14 @@ public class ProductDBTestClientModified {
 		
 		productDB.addProduct(ipod);
 		Assert.assertNotNull(productDB.getProductsByDept(DeptCode.ELECTRONICS));
-					
-		System.out.println(beforeTotalCount);
-		System.out.println(beforeDeptCount);
-		
+						
 		System.out.println("********* start testing ************");
 		
 		ipod = productDB.getProduct(1);
 		
 		Assert.assertNotNull(productDB.getProduct(ipod.getId()));
 		Assert.assertNotNull(productDB.getAllProducts());
-		
-		System.out.println(productDB.getAllProducts().size());
-		System.out.println(productDB.getProductsByDept(ipod.getDept()).size());
-		
+				
 		Assert.assertEquals(productDB.getAllProducts().size(), beforeTotalCount+1);
 		Assert.assertEquals(productDB.getProductsByDept(ipod.getDept()).size(), beforeDeptCount +1);
 		

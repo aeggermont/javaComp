@@ -12,8 +12,6 @@ import productdb.ProductNotFoundException;
 /* Additional imports */
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Calendar;
 import java.net.Socket;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,9 +19,16 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
 /**
- * Client side of homework #5
+ * Client side of homework #5. 
+ * 
+ * <P>
+ * This class implements the ProductDB interface 
+ * by constructing messages for the DB server to perform product additions,
+ * deletes, updates, and listing. This class also allows to shutdown the server
+ * and to load data from disk and and save data to disk
  * 
  * @author aeggermont
+ * @version 1.0
  *
  */
 public class ProductDBClient implements ProductDB {
@@ -33,6 +38,7 @@ public class ProductDBClient implements ProductDB {
 	
 	/*
 	 * Connects to the ProductDB server
+	 * 
 	 * @throws IO exception for unsuccessful  connections
 	 */
 	public void connectToServer(){
@@ -243,7 +249,7 @@ public class ProductDBClient implements ProductDB {
 		
 		String mesg = null;
 		String lineMesg = null;
-		mesg = "DELETE;" + String.valueOf(productId);
+		mesg = "DELETE;" + String.valueOf(productId) + ",";
 		connectToServer();
 		
 		try{
@@ -299,7 +305,6 @@ public class ProductDBClient implements ProductDB {
     	
     	String msgLine = null;
     	String msg= "LOAD;,";
-    	Date d = Calendar.getInstance().getTime();
     	
     	connectToServer();
     	
@@ -331,8 +336,7 @@ public class ProductDBClient implements ProductDB {
     @Override
     public String quitServer(){
     	
-    	String msg= "QUIT;" + ",";
-    	Date d = Calendar.getInstance().getTime();
+    	String msg= "QUIT;,";
     	
     	connectToServer();
     	
@@ -364,7 +368,6 @@ public class ProductDBClient implements ProductDB {
 		productDB = new ProductDBClient();
 		
 		Product updatedProd = new Product("ipod3", 200.00, DeptCode.ELECTRONICS);
-		
 		
 		try {
 			System.out.println(productDB.getProduct(5));

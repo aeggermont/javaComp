@@ -274,42 +274,6 @@ public class ProductDBImpl implements ProductDB {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			String line = reader.readLine();
 			System.out.println("got request: " + line);
-		}
-		
-		
-		
-		
-		
-		/*
-		try{
-			productDB.addProduct(new Product("ipod1", 126.0, DeptCode.ELECTRONICS));
-			productDB.addProduct(new Product("ipod2", 127.3, DeptCode.ELECTRONICS));
-			productDB.addProduct(new Product("ipod3", 128.4, DeptCode.ELECTRONICS));
-			productDB.addProduct(new Product("ipod4", 129.4, DeptCode.ELECTRONICS));
-			productDB.addProduct(new Product("ipod5", 122.6, DeptCode.ELECTRONICS));
-			productDB.addProduct(new Product("The Lord of the Rings 1", 400.23, DeptCode.BOOK));
-			productDB.addProduct(new Product("The Lord of the Rings 2", 410.23, DeptCode.BOOK));
-			productDB.addProduct(new Product("The Lord of the Rings 3", 420.23, DeptCode.BOOK));
-		} catch (ProductAlreadyExistsException mes) {
-			System.out.println("Unable to add product " + mes);
-		}
-		
-		
-		System.out.println("===== Lists All Products ================");
-		
-		for (Product item: productDB.getAllProducts()){
-			System.out.println("-------------------------");
-			System.out.println(item.getName());
-			System.out.println(item.getId());
-			System.out.println(item.getPrice());		
-		}
-		
-		System.out.println("===== Saving Data to Disk ================");
-		
-		//productDB.saveProductsToDisk();
-		
-		*/
-		
-		
+		}		
 	}
 }

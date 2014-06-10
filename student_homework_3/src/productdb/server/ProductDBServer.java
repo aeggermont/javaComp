@@ -32,6 +32,7 @@ import productdb.ProductAlreadyExistsException;
  * The main program for the server for homework #5
  * 
  * @author aeggermont
+ * @version 1.0
  *
  */
 public class ProductDBServer extends ProductDBImpl{
@@ -44,6 +45,30 @@ public class ProductDBServer extends ProductDBImpl{
 	}
 	
 	
+	/**
+	 * Process a request received from a client to add, update, delete, list products 
+	 * and load/save  catalog data from disk, and stop the server.
+	 * 
+	 * <p>
+	 * This method is used to decode and encode messages messages exchanged with a 
+	 * client for the product DB. Valid messages contain semi-colon (;) after the 
+	 * header of the message specifying the purpose (UPDATE, ADD, DELETE, etc) 
+	 * and comma separated arguments after.
+	 * 
+	 * The following messages are valid for the server to process a request:
+	 * 
+	 * ADD;name:ipod,dept:ELECTRONICS,price:125.00 
+	 * UPDATE;name:ipod,dept:ELECTRONICS,price:125.00
+	 * DELETE;name:ipod,dept:ELECTRONICS,price:125.00
+	 * LIST;,
+	 * SERACH;,
+	 * 
+	 * 
+	 * @param socket a file handler to exchange data with a connected client 
+	 * @param mesg   a message sent from the client to perform an operation with
+	 *               the product catalog  
+	 * @throws IOException if messages can not be exchanged with a client
+	 */
 	public void processRequest(Socket socket, String mesg) throws IOException {
 	
 		String [] productParams;
@@ -127,7 +152,6 @@ public class ProductDBServer extends ProductDBImpl{
 			
 		case LIST:
 			results = "[OK] About to print products by code" + " [" + ts + "]";
-			//System.out.println(productParams[0].split(":")[1]);
 			
 			for ( Product item : getProductsByDept( DeptCode.valueOf(productParams[0].split(":")[1]))){
 				System.out.println(item);
@@ -207,10 +231,11 @@ public class ProductDBServer extends ProductDBImpl{
 	}
 	
 	/**
+	 * Product catalog program starts in this method
 	 * @param args
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 			
 		ProductDBServer productDB =  new ProductDBServer();
 		System.out.println(" ****** Loading Data to Database ******");
@@ -230,10 +255,7 @@ public class ProductDBServer extends ProductDBImpl{
 			} catch (IOException e){
 				e.printStackTrace();
 			} finally{
-				for( Product item: productDB.getAllProducts()){
-					System.out.println("==========");
-					System.out.println(item);
-				}
+				System.out.println("Finished processing request");
 			}
 		}
 	}
